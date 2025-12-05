@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude-code:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Skill(example-skills:skill-creator)",
+      "Skill(prompt-rewriter)",
+      "Bash(python scripts/init_skill.py:*)",
+      "Bash(python3:*)",
+      "Bash(rm:*)",
+      "Bash(apt list:*)",
+      "Bash(python:*)",
+      "Bash(uv sync)",
+      "Bash(curl:*)",
+      "Bash(sh:*)",
+      "Bash(source:*)",
+      "Bash(uv run python main.py:*)",
+      "Bash(tree:*)",
+      "Skill(airss)",
+      "Bash(uv run:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
