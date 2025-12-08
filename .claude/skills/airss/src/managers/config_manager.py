@@ -3,6 +3,7 @@
 """
 
 import os
+import re
 import sys
 import yaml
 from typing import Dict, List
@@ -43,7 +44,8 @@ class SocialMediaConfig:
                 if isinstance(user_config, dict):
                     user_id = user_config.get('id', '')
                     user_name = user_config.get('name', f"{platform_name.upper()} 用户")
-                    users.append(SimpleUser(user_id, user_name, platform_name))
+                    xgoid = user_config.get('xgoid')
+                    users.append(SimpleUser(user_id, user_name, platform_name, xgoid))
         
         return users
     
@@ -61,10 +63,31 @@ class SocialMediaConfig:
         """为用户生成RSS URLs（用户平台固定）"""
         urls = []
         templates = self.get_rss_templates_for_platform(user.platform)
+        context = {
+            # 兼容旧配置，默认用 id 填充 username
+            "username": user.id,
+            "id": user.id,
+            "name": user.name,
+            # Twitter 新增的 xgoid，如不存在则保持 None 以便后续检测
+            "xgoid": getattr(user, "xgoid", None),
+        }
         
-        # 使用用户ID生成URLs
         for template in templates:
-            url = template.format(username=user.id)
-            urls.append(url)
+            placeholders = re.findall(r"{(.*?)}", template)
+            # 检查模板所需的占位符是否都有值
+            missing_fields = [
+                field for field in placeholders
+                if context.get(field) in (None, "")
+            ]
+            if missing_fields:
+                print(f"⚠️ 模板 {template} 缺少字段: {', '.join(missing_fields)}，已跳过")
+                continue
+            
+            try:
+                url = template.format(**context)
+                urls.append(url)
+            except KeyError as e:
+                # 捕获未知占位符，便于调试
+                print(f"⚠️ 模板 {template} 包含未识别占位符 {e}，已跳过")
         
         return urls

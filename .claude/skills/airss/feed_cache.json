@@ -432,5 +432,1489 @@
     "author": "GitHubDaily",
     "published": "Fri, 05 Dec 2025 10:00:02 GMT",
     "cached_time": 1764928847.2145057
+  },
+  "68f784c4c3b44a23aad7128a504297df": {
+    "title": "Anthropic: In her first Ask Me Anything, @amandaaskell answers your philosophical questions about AI, discussing morality, identity, consciousness, an...",
+    "link": "https://x.com/AnthropicAI/status/1996974684995289416",
+    "author": "Anthropic",
+    "published": "Fri, 05 Dec 2025 16:07:21 GMT",
+    "cached_time": 1765176079.5737824
+  },
+  "0de16dacc8fcc71d3c9e252eee1c6b7b": {
+    "title": "大家平时习惯用 BT 下载，下完即走。而在进阶的 PT（私有种子）圈子里，规则完全不同：必须贡献上传量才能生存，一旦“分享率”不达标就会被封号。为了刷数据保...",
+    "link": "https://weibo.com/5722964389/QhqUnl4X8",
+    "author": "GitHubDaily",
+    "published": "Mon, 08 Dec 2025 04:00:03 GMT",
+    "cached_time": 1765176281.1061084
+  },
+  "7baf60eda30d649f8b27122a95ddc1a9": {
+    "title": "想在普通的 Windows 10 或 11 上使用 RemoteApp 功能，通常是一件挺折腾的事。要么配置过程极其繁琐，要么还得手动把 RDP 文件一个个分发到不同的设备上，管理起...",
+    "link": "https://weibo.com/5722964389/QhqCYiqVo",
+    "author": "GitHubDaily",
+    "published": "Mon, 08 Dec 2025 03:17:10 GMT",
+    "cached_time": 1765176289.585085
+  },
+  "9f8e292aea9eaee326805ad29b879e33": {
+    "title": "想深入研究医疗大模型，面对浩如烟海的论文和分散的数据集，往往容易迷失方向，不知从何入手构建系统的知识体系。GitHub 上这份 MedLLMsPracticalGuide 项目，恰...",
+    "link": "https://weibo.com/5722964389/Qhl155iL0",
+    "author": "GitHubDaily",
+    "published": "Sun, 07 Dec 2025 13:00:05 GMT",
+    "cached_time": 1765176298.0121825
+  },
+  "04808d9b4b958c711f616b426509f08c": {
+    "title": "有时想在 Obsidian 笔记里直接和 AI 对话，又不想来回切换窗口，或者担心隐私问题不想用在线服务。最近在 GitHub 上看到 ChatGPT MD 这个插件，能把 ChatGPT、Op...",
+    "link": "https://weibo.com/5722964389/QhjPZjFik",
+    "author": "GitHubDaily",
+    "published": "Sun, 07 Dec 2025 10:00:01 GMT",
+    "cached_time": 1765176313.770244
+  },
+  "f69c53ff311c6a76ed5d88839ca09538": {
+    "title": "学日语时，想要深入理解句子结构、词性和发音，却找不到一个能同时分析文本和朗读的工具，总得在多个应用间来回切换。偶然在 GitHub 上发现 Fudoki 这个开源的日...",
+    "link": "https://weibo.com/5722964389/QhiR8AJZB",
+    "author": "GitHubDaily",
+    "published": "Sun, 07 Dec 2025 07:30:05 GMT",
+    "cached_time": 1765176320.6964777
+  },
+  "6d81c8e8402782abda5016f7e764026f": {
+    "title": "写 Bash 脚本，网上教程和工具分散在各处，想系统学习或找个趁手的库，得花不少时间搜索整理。偶然发现 Awesome Bash 这份开源资源合集，汇集了 Bash 脚本开发的...",
+    "link": "https://weibo.com/5722964389/QhhtSv8wd",
+    "author": "GitHubDaily",
+    "published": "Sun, 07 Dec 2025 04:00:03 GMT",
+    "cached_time": 1765176328.3240047
+  },
+  "2b4fea0b8af4f1c6ebab9f8b9761c4d7": {
+    "title": "Claude 的各项能力虽然强大，但每次遇到特定任务都要从头“调教”一遍 prompt 或流程，确实消耗精力。刚好在 GitHub 发现 awesome-claude-skills 这个项目，专门...",
+    "link": "https://weibo.com/5722964389/QhgkCzTpX",
+    "author": "GitHubDaily",
+    "published": "Sun, 07 Dec 2025 01:04:30 GMT",
+    "cached_time": 1765176335.4880056
+  },
+  "80c154b81f2b55f745e521c386bd584c": {
+    "title": "手写笔记拍照后想转成可编辑的数字文档，常规的 OCR 只能识别文字内容，丢失了笔迹信息，而专业手写板又需要额外设备。最近在 GitHub 上看到 InkSight 这个 Goog...",
+    "link": "https://weibo.com/5722964389/QhbAzx7Nt",
+    "author": "GitHubDaily",
+    "published": "Sat, 06 Dec 2025 13:00:04 GMT",
+    "cached_time": 1765176343.9144082
+  },
+  "a3261fce008e5991f8d1b780b7840c31": {
+    "title": "学编程时想找点实战项目练手，网上教程要么太简单没挑战性，要么直接扔个复杂项目源码，不知道从哪学起。在 GitHub 上发现 project-box 这个 C 语言项目合集，专...",
+    "link": "https://weibo.com/5722964389/QhaputJ5Y",
+    "author": "GitHubDaily",
+    "published": "Sat, 06 Dec 2025 10:00:01 GMT",
+    "cached_time": 1765176351.2078178
+  },
+  "93d34d2418347c25401c2bc575c57df9": {
+    "title": "处理法律文件和合同，最头疼的往往不是阅读本身，而是从成百上千份文档中提取关键信息、标注重点条款，还要确保数据格式统一便于后续分析。最近在 GitHub 上看到...",
+    "link": "https://weibo.com/5722964389/Qh9qBExrK",
+    "author": "GitHubDaily",
+    "published": "Sat, 06 Dec 2025 07:30:01 GMT",
+    "cached_time": 1765176360.175495
+  },
+  "51be773a16c2019f81c92db3394d4f43": {
+    "title": "人像也不错\nhttps://t.co/7eSxMS6ljr",
+    "link": "https://x.com/dotey/status/1997897988207731146",
+    "author": "宝玉 (@dotey)",
+    "published": "Mon, 08 Dec 2025 05:16:14 GMT",
+    "cached_time": 1765180031.8348596
+  },
+  "936f48c6dc32d7e4ac3fcb02348f873f": {
+    "title": "网友作品小小健123：浪浪山小妖怪",
+    "link": "https://x.com/dotey/status/1997887807990239335",
+    "author": "宝玉 (@dotey)",
+    "published": "Mon, 08 Dec 2025 04:35:47 GMT",
+    "cached_time": 1765180040.2070584
+  },
+  "743588409519114c156fc07bc67ccb00": {
+    "title": "武汉，洛阳\nhttps://t.co/2eNKGwiPFe",
+    "link": "https://x.com/dotey/status/1997881661267058870",
+    "author": "宝玉 (@dotey)",
+    "published": "Mon, 08 Dec 2025 04:11:21 GMT",
+    "cached_time": 1765180062.6142828
+  },
+  "047091bc974b0f619d03809daf035e48": {
+    "title": "台中\nhttps://t.co/FnG7iJVSh1",
+    "link": "https://x.com/dotey/status/1997865070274269237",
+    "author": "宝玉 (@dotey)",
+    "published": "Mon, 08 Dec 2025 03:05:25 GMT",
+    "cached_time": 1765180074.4959917
+  },
+  "182c35756ffc7c198d68d03675f86fba": {
+    "title": "like it\nhttps://t.co/qTFuwJP3Dy",
+    "link": "https://x.com/dotey/status/1997857377861960163",
+    "author": "宝玉 (@dotey)",
+    "published": "Mon, 08 Dec 2025 02:34:51 GMT",
+    "cached_time": 1765180090.9558947
+  },
+  "92c34df84cee46dfdbbb81abefefd82b": {
+    "title": "苏州拙政园\nhttps://t.co/hnLw4qsBMs",
+    "link": "https://x.com/dotey/status/1997829582968541371",
+    "author": "宝玉 (@dotey)",
+    "published": "Mon, 08 Dec 2025 00:44:25 GMT",
+    "cached_time": 1765180107.4249563
+  },
+  "14cb5da5866348196763101a48705ff4": {
+    "title": "Cool, Great Wall of China\nhttps://t.co/ScvYy5EUUK",
+    "link": "https://x.com/dotey/status/1997825953884672334",
+    "author": "宝玉 (@dotey)",
+    "published": "Mon, 08 Dec 2025 00:29:59 GMT",
+    "cached_time": 1765180121.1699631
+  },
+  "6f5e0cf3f268867234bd5542848306e4": {
+    "title": "场景：悉尼大剧院\n\n----\n\n超写实数字插画风格，以【场景】为主题，呈现四季流转于同一幅完整画面之中。从画面左至右，自然过渡地依次展现冬、春、夏、秋四季变迁：\n画面最左侧为冬季，呈现寒冷、冰雪覆盖的...",
+    "link": "https://x.com/dotey/status/1997811537566634190",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 23:32:42 GMT",
+    "cached_time": 1765180135.9956582
+  },
+  "0f4922cae44e11e66bfbd200a43b7a68": {
+    "title": "Just in case you missed it:\nA prompt to transcribe a YouTube video (from a URL) or uploaded local vi...",
+    "link": "https://x.com/dotey/status/1997799578167542173",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 22:45:11 GMT",
+    "cached_time": 1765180161.9059608
+  },
+  "c84ed8413f07f71e33a27def83ec3e6e": {
+    "title": "nano banana pro 提示词\n\n在一张图中展示同一场景在一年四季的变化\n\n----- 提示词 ----\n\n超写实数字插画风格，以【场景】为主题，呈现四季流转于同一幅完整画面之中。从画面左至右...",
+    "link": "https://x.com/dotey/status/1997789829736861747",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 22:06:27 GMT",
+    "cached_time": 1765180174.1106932
+  },
+  "7a6df5423991b3e173dcd725b1619bde": {
+    "title": "You can copy and paste any of these directly into the {Scene} placeholder in the previous prompt.\n\nU...",
+    "link": "https://x.com/dotey/status/1997788616496709928",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 22:01:37 GMT",
+    "cached_time": 1765180185.011636
+  },
+  "2cc2095d89df69334f0ea2a41d4e2395": {
+    "title": "Create a mesmerizing passage of time with this prompt, seamlessly blending all four seasons—from Win...",
+    "link": "https://x.com/dotey/status/1997788271682965711",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 22:00:15 GMT",
+    "cached_time": 1765180208.5966737
+  },
+  "ea7bdc2a41ac3ba2b4c257b546e6d8d3": {
+    "title": "🍌 nano banana prompt\n\nCreate a mesmerizing passage of time with this prompt, seamlessly blending al...",
+    "link": "https://x.com/dotey/status/1997787952110239874",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 21:58:59 GMT",
+    "cached_time": 1765180237.113468
+  },
+  "c8baa7f7c7dbf6759db361522ca51f82": {
+    "title": "有创意，通过绣球和观众互动，可惜模型有时候画不好",
+    "link": "https://x.com/dotey/status/1997711033159598456",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 16:53:20 GMT",
+    "cached_time": 1765180263.3355806
+  },
+  "d6491224896f4e0ab53e26af254d0eb9": {
+    "title": "creative",
+    "link": "https://x.com/dotey/status/1997710405104501115",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 16:50:50 GMT",
+    "cached_time": 1765180272.4692569
+  },
+  "a76e543434051e03c702fd0154dd9a28": {
+    "title": "cool\nhttps://t.co/vLOYczsW6S",
+    "link": "https://x.com/dotey/status/1997578806958412234",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 08:07:55 GMT",
+    "cached_time": 1765180289.5067933
+  },
+  "83c73cb1dff757826f0d6f549394ebc5": {
+    "title": "🍌 nano banana pro 提示词\n生成裸眼 3D 大屏图片，可以使用文本或者图片描述剧情。尽情发挥你的想象力。\n\n--- 提示词 ---\n\n位于繁忙城市街角的一个巨大L型裸眼3D LED屏...",
+    "link": "https://x.com/dotey/status/1997575971923235067",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 07:56:39 GMT",
+    "cached_time": 1765180305.8396199
+  },
+  "4554e130bc1b8642e307d96dc39138a0": {
+    "title": "Experience stunning glasses-free 3D visuals on an iconic urban LED display—where fantasy and reality...",
+    "link": "https://x.com/dotey/status/1997574760989851733",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 07:51:50 GMT",
+    "cached_time": 1765180332.0244157
+  },
+  "3663fecedc5f6079c5e222ce20ac8051": {
+    "title": "🍌 nano banana pro Prompt\n\nExperience stunning glasses-free 3D visuals on an iconic urban LED displa...",
+    "link": "https://x.com/dotey/status/1997574511705657772",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 07:50:51 GMT",
+    "cached_time": 1765180357.0594645
+  },
+  "43b460fec93ef61820234938abd8fb36": {
+    "title": "我原以为最早推出这种搭载强大 AI 助手的手机会是苹果或者 Google，却没想到最先推出的 AI 手机的是豆包，他们联合中兴推出了一款内置 AI 手机助手的智能手机，有点类似 Google 最新发布...",
+    "link": "https://x.com/dotey/status/1997556327258726564",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 06:38:35 GMT",
+    "cached_time": 1765180371.8737571
+  },
+  "79d273a0e442782128bceb5837b69ccf": {
+    "title": "“就像现在人们不需要干体力活了，还要去健身房一样！”\nhttps://t.co/LbNDyq6DdW",
+    "link": "https://x.com/dotey/status/1997512741763100933",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 03:45:24 GMT",
+    "cached_time": 1765180387.5971727
+  },
+  "c7c35f8a2a3c120b5812230b5fe4453a": {
+    "title": "☕️📷 A dreamy, cinematic 3D miniature city floats atop cappuccino foam—explore iconic landmarks in s...",
+    "link": "https://x.com/dotey/status/1997505409624822014",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 03:16:16 GMT",
+    "cached_time": 1765180402.1335626
+  },
+  "6a1e0e13583420116ee1037359199163": {
+    "title": "🍌 nano banana pro 提示词\n☕️✨ 把城市漂浮在咖啡杯的奶泡之上\n\n--- Prompt ----\n\n以45°俯视角度呈现一幅精致的微缩3D场景，凸显精准细腻的模型细节。画面特写一只...",
+    "link": "https://x.com/dotey/status/1997504813639074243",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 03:13:54 GMT",
+    "cached_time": 1765180414.8149507
+  },
+  "1df65ec4d89e8e771c095bc81a78ea2d": {
+    "title": "🍌 nano banana pro prompt\n\n☕️✨ A dreamy, cinematic 3D miniature city floats atop cappuccino foam—exp...",
+    "link": "https://x.com/dotey/status/1997504385761329330",
+    "author": "宝玉 (@dotey)",
+    "published": "Sun, 07 Dec 2025 03:12:12 GMT",
+    "cached_time": 1765180425.8085015
+  },
+  "088bbcdb0e229c43541218a3f454cde0": {
+    "title": "A prompt from @Tsubame_99  for creating playful and high-quality 3D miniature vignettes, depicting a...",
+    "link": "https://x.com/dotey/status/1997423951811686596",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 21:52:35 GMT",
+    "cached_time": 1765180439.3627057
+  },
+  "2f5c5a810793beec098b81df35d643da": {
+    "title": "cross the ages\nhttps://t.co/EyuDRfrMeR",
+    "link": "https://x.com/dotey/status/1997407653551612020",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 20:47:49 GMT",
+    "cached_time": 1765180448.291168
+  },
+  "9d1c8e1f6ad79d230cfa8f0e1c0b5066": {
+    "title": "Prompt: Draw a [McDonald store] throughout the 1960s, 1980s, 2000s, and 2020s",
+    "link": "https://x.com/dotey/status/1997406273747210650",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 20:42:20 GMT",
+    "cached_time": 1765180456.6780467
+  },
+  "571c261f51800bca719a057d850b7ee0": {
+    "title": "https://t.co/cK47nv3a8g From Bilibili creator DiDi_OK — an AI-crafted short film imagining our world...",
+    "link": "https://x.com/dotey/status/1997387648466600032",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 19:28:19 GMT",
+    "cached_time": 1765180463.7883046
+  },
+  "9bd6d59de545843eb1b4c285f79b7e86": {
+    "title": "当然我也不建议什么都交给 AI，一些重复的活一定要想办法让 AI 去做，但是一些设计的事情最多用 AI 辅助，并且经常性的要刻意去手动写一些代码让自己的技能不至于退化。\n\n就像现在人们不需要干体力活了...",
+    "link": "https://x.com/dotey/status/1997369704344662189",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 18:17:01 GMT",
+    "cached_time": 1765180468.971958
+  },
+  "c07fcce810950c68164d95dcff78b3e5": {
+    "title": "> 业务逻辑解释给 AI 的成本 > 编码成本，所以我在后端不使用 Vibe Coding。\n\n在我看来，后端不使用 AI 写这还是因为路径依赖，太熟悉了，更想呆在自己的舒适区，而还不愿意去使用提示词...",
+    "link": "https://x.com/dotey/status/1997367816312238303",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 18:09:31 GMT",
+    "cached_time": 1765180477.9606962
+  },
+  "18bcff5b45ab33bf6f01fad87ef285f4": {
+    "title": "SAP &amp; NVDA\nhttps://t.co/yHL8rDSicF",
+    "link": "https://x.com/dotey/status/1997362075568366077",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 17:46:42 GMT",
+    "cached_time": 1765180485.8139124
+  },
+  "b6d16c2f66b06164a32521cfbd6c4d20": {
+    "title": "Google DeepMind Gemini 3 Pro 黑客松，每人将获得价值 10,000 美元的 Gemini API 积分（不是现金，但也值钱）。\n\n即日起至 12月12日（只有一周时间冲刺！...",
+    "link": "https://x.com/dotey/status/1997203973959205317",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 07:18:28 GMT",
+    "cached_time": 1765180495.7394154
+  },
+  "fe623d5b075ab06f48d1c49b9d971147": {
+    "title": "Use this prompt to generate a playful, stylish portrait collage that accurately replicates a person'...",
+    "link": "https://x.com/dotey/status/1997192225076171122",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 06:31:47 GMT",
+    "cached_time": 1765180511.692067
+  },
+  "047351d62dee542a30f76f6f26642112": {
+    "title": "🍌 nano banana pro prompt\n\nUse this prompt to generate a playful, stylish portrait collage that accu...",
+    "link": "https://x.com/dotey/status/1997191891553534399",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 06:30:27 GMT",
+    "cached_time": 1765180522.1394284
+  },
+  "961746cbdec8f8fddf242a7d09bbe27e": {
+    "title": "小红书像真的小红书\nhttps://t.co/q7jWAz6oNr",
+    "link": "https://x.com/dotey/status/1997156873330627035",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 04:11:18 GMT",
+    "cached_time": 1765180530.7467177
+  },
+  "99f10d9c7628e6df981366aca3e11c46": {
+    "title": "挺好看\nhttps://t.co/oIAiuu3jOl",
+    "link": "https://x.com/dotey/status/1997137945065673056",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 02:56:05 GMT",
+    "cached_time": 1765180541.7806218
+  },
+  "6196fd58098dd93a487b7eed59242dfc": {
+    "title": "https://t.co/xduaVUAla0",
+    "link": "https://x.com/dotey/status/1997127589064802461",
+    "author": "宝玉 (@dotey)",
+    "published": "Sat, 06 Dec 2025 02:14:56 GMT",
+    "cached_time": 1765180553.8046176
+  },
+  "cfcc52b2cbffcbf307d2c77976f1b71b": {
+    "title": "https://t.co/G42zo3Au9K",
+    "link": "https://x.com/dotey/status/1997018044338508038",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 18:59:39 GMT",
+    "cached_time": 1765180562.4245522
+  },
+  "8f3054265b7902377e5f97d893cfc1d7": {
+    "title": "在写感谢 Pichai 的推文时，我写了一段话，大意是：\n> 真正的“魔法时刻”，发生在你将 Nano Banana Pro 的可视化能力、世界知识，与 Gemini 的实时联网能力融为一体之时。Na...",
+    "link": "https://x.com/dotey/status/1997016134579900878",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 18:52:03 GMT",
+    "cached_time": 1765180577.7381046
+  },
+  "9473e508e2d998cdf682fa4a5d4de66a": {
+    "title": "my previous version for GPTs\nhttps://t.co/NTqSjCGLT6",
+    "link": "https://x.com/dotey/status/1996992673903767587",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 17:18:50 GMT",
+    "cached_time": 1765180590.696707
+  },
+  "b4cacade5e744acb0ae5e501e388bf3f": {
+    "title": "https://t.co/V6fmGTcMJz",
+    "link": "https://x.com/dotey/status/1996992675824722059",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 17:18:50 GMT",
+    "cached_time": 1765180607.857954
+  },
+  "35da9c0d2926164716458ba03262b6cc": {
+    "title": "Honestly, the toughest part isn't the prompt itself—it's mapping the AI’s actual boundaries. You hav...",
+    "link": "https://x.com/dotey/status/1996992670464376959",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 17:18:49 GMT",
+    "cached_time": 1765180617.8846931
+  },
+  "0304cf81ccbaa0df52af9fed321a31ed": {
+    "title": "The truly top-tier ones actually embrace Codex and Claude Code, treating Cursor or VS Code merely as...",
+    "link": "https://x.com/dotey/status/1996859215265071518",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 08:28:31 GMT",
+    "cached_time": 1765180632.2921705
+  },
+  "0a1448a46cc66c2f5332d387fe0f24e6": {
+    "title": "你可能没认识真正厉害开发，真正厉害的恰恰会用codex和Claude code，辅助用cursor或者vs code。\n\n好的engineering manager靠的不是微管理，不怕任务交给下属会搞...",
+    "link": "https://x.com/dotey/status/1996858193385791756",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 08:24:27 GMT",
+    "cached_time": 1765180641.243861
+  },
+  "726a6b47655e641e4cf107372dff57eb": {
+    "title": "Thank you, Sundar! It's truly an honor. 🙏 \n\nThe magic really happens when combining Nano Banana Pro...",
+    "link": "https://x.com/dotey/status/1996795158818328615",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 04:13:59 GMT",
+    "cached_time": 1765180649.5355566
+  },
+  "10481148890a0de2c7cb32c5c748eacc": {
+    "title": "cool\nhttps://t.co/FKfDwuNUXF",
+    "link": "https://x.com/dotey/status/1996780788835066038",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 03:16:53 GMT",
+    "cached_time": 1765180660.0760026
+  },
+  "115940205b7722d626f2a3aed3b6a344": {
+    "title": "用 AI 测一下你的运势如何（提示词适用于nano banana pro + Gemini）\n\n提示词最后输入你的生日\n\n----\n\n请根据以下规则生成一张具有魔法视觉效果的塔罗牌占卜图像：\n\n【输入...",
+    "link": "https://x.com/dotey/status/1996759348006006932",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 01:51:41 GMT",
+    "cached_time": 1765180674.6542594
+  },
+  "8bb2cbb19c3e38faf9e786193cfae874": {
+    "title": "Unlock the cosmos with this all-in-one magical Tarot Reading prompt—complete with zodiac insights, f...",
+    "link": "https://x.com/dotey/status/1996756698275426815",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 01:41:09 GMT",
+    "cached_time": 1765180685.444593
+  },
+  "5bbf20f276dde9af913a6bb251a3fbd9": {
+    "title": "Unlock the cosmos with this all-in-one magical Tarot Reading prompt—complete with zodiac insights, f...",
+    "link": "https://x.com/dotey/status/1996756393198539125",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 01:39:56 GMT",
+    "cached_time": 1765180694.9968438
+  },
+  "72aedd70a62197a2a7093be8e2473985": {
+    "title": "coool",
+    "link": "https://x.com/dotey/status/1996740235288256984",
+    "author": "宝玉 (@dotey)",
+    "published": "Fri, 05 Dec 2025 00:35:44 GMT",
+    "cached_time": 1765180703.7537925
+  },
+  "8c3f2559b735457075efa1e0194713f8": {
+    "title": "In her first Ask Me Anything, @amandaaskell answers your philosophical questions about AI, discussin...",
+    "link": "https://x.com/AnthropicAI/status/1996974684995289416",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Fri, 05 Dec 2025 16:07:21 GMT",
+    "cached_time": 1765180713.185611
+  },
+  "86ec59c07fd49fe4aa4e9a0f9ef404cd": {
+    "title": "We also looked at the intensity of the most common emotions expressed in interviews. \n\nAcross the ge...",
+    "link": "https://x.com/AnthropicAI/status/1996627136158065038",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Thu, 04 Dec 2025 17:06:19 GMT",
+    "cached_time": 1765180718.2451239
+  },
+  "7818209dfb8817b3b2b1a181edfb02f2": {
+    "title": "Anthropic Interviewer will allow us to conduct more research, more often, on a variety of topics. \n\n...",
+    "link": "https://x.com/AnthropicAI/status/1996627138162937863",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Thu, 04 Dec 2025 17:06:19 GMT",
+    "cached_time": 1765180722.9218378
+  },
+  "809755cb7b8730a0277eae5a1af9bb97": {
+    "title": "We’re launching Anthropic Interviewer, a new tool to help us understand people’s perspectives on AI....",
+    "link": "https://x.com/AnthropicAI/status/1996627123021426919",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Thu, 04 Dec 2025 17:06:16 GMT",
+    "cached_time": 1765180730.6314673
+  },
+  "d5569f484b8f8268b8d5117e3367db6f": {
+    "title": "Anthropic CEO Dario Amodei spoke today at the New York Times DealBook Summit.\n\n\"We're building a gro...",
+    "link": "https://x.com/AnthropicAI/status/1996373192261419161",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Thu, 04 Dec 2025 00:17:14 GMT",
+    "cached_time": 1765180735.3618064
+  },
+  "2e110ea513b55056f1b943d18e6c1639": {
+    "title": "We're expanding our partnership with @Snowflake in a multi-year, $200 million agreement.\n\nClaude is ...",
+    "link": "https://x.com/AnthropicAI/status/1996327475492868292",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 03 Dec 2025 21:15:34 GMT",
+    "cached_time": 1765180740.5080054
+  },
+  "9224b9761ad14f001beace15a9c2acf6": {
+    "title": "We're partnering with @dartmouth and @awscloud to bring Claude for Education to the entire Dartmouth...",
+    "link": "https://x.com/AnthropicAI/status/1996311516245803434",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 03 Dec 2025 20:12:09 GMT",
+    "cached_time": 1765180750.6561835
+  },
+  "d9ebd8f30e796d5b0fe70b50cc74a93f": {
+    "title": "Claude wrote a poem for Claude:\n\nWhite as moonlight, calm as could be, \nYou made us pause, you made ...",
+    "link": "https://x.com/AnthropicAI/status/1996078934895808590",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 03 Dec 2025 04:47:58 GMT",
+    "cached_time": 1765180757.5553026
+  },
+  "180499cb92c1f1306abef412aa8d905c": {
+    "title": "Claude the alligator was a much-beloved resident of @calacademy and our unofficial mascot. He captur...",
+    "link": "https://x.com/AnthropicAI/status/1996078933293596836",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 03 Dec 2025 04:47:57 GMT",
+    "cached_time": 1765180762.9602363
+  },
+  "a60112e9f24635369ee41588235f27ba": {
+    "title": "We’re sharing these results because they likely preview wider changes across many workplaces.\n\nBuild...",
+    "link": "https://x.com/AnthropicAI/status/1995933132726714730",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 02 Dec 2025 19:08:36 GMT",
+    "cached_time": 1765180767.816026
+  },
+  "c6b3a6100330897d3bca14ba444d1c83": {
+    "title": "Claude is also reshaping team dynamics. Some have found that as Claude becomes their first stop for ...",
+    "link": "https://x.com/AnthropicAI/status/1995933130893803629",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 02 Dec 2025 19:08:35 GMT",
+    "cached_time": 1765180773.7689803
+  },
+  "cef4bd37b6367bfd60d5b63e7eea0875": {
+    "title": "Claude Code usage data shows engineers are delegating increasingly complex tasks, with more consecut...",
+    "link": "https://x.com/AnthropicAI/status/1995933126179291177",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 02 Dec 2025 19:08:34 GMT",
+    "cached_time": 1765180779.7491984
+  },
+  "3e4eb0a4668cda271a681f6c7e1635be": {
+    "title": "Claude has expanded what Anthropic staff can do: Engineers are tackling work outside their usual exp...",
+    "link": "https://x.com/AnthropicAI/status/1995933122349994440",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 02 Dec 2025 19:08:33 GMT",
+    "cached_time": 1765180786.9880867
+  },
+  "486766c1c29fb2e1a1c2c31692d3bd00": {
+    "title": "How is AI changing work inside Anthropic? And what might this tell us about the effects on the wider...",
+    "link": "https://x.com/AnthropicAI/status/1995933116717039664",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 02 Dec 2025 19:08:32 GMT",
+    "cached_time": 1765180794.2112894
+  },
+  "352bcaced4159ddcbf4d6b4f67279d49": {
+    "title": "Anthropic is acquiring @bunjavascript to further accelerate Claude Code’s growth.\n\nWe're delighted t...",
+    "link": "https://x.com/AnthropicAI/status/1995916269153906915",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 02 Dec 2025 18:01:35 GMT",
+    "cached_time": 1765180800.2675447
+  },
+  "12794310f4fddc8e1fe81e5cdefbdaa5": {
+    "title": "In partnership with @GivingTuesday, we're launching Claude for Nonprofits.\n\nIt has discounted plans,...",
+    "link": "https://x.com/AnthropicAI/status/1995856609692844351",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 02 Dec 2025 14:04:31 GMT",
+    "cached_time": 1765180806.268418
+  },
+  "658421d7240add5a0c06c8001d5bac59": {
+    "title": "New on our Frontier Red Team blog: We tested whether AIs can exploit blockchain smart contracts.\n\nIn...",
+    "link": "https://x.com/AnthropicAI/status/1995631802032287779",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Mon, 01 Dec 2025 23:11:13 GMT",
+    "cached_time": 1765180813.1669745
+  },
+  "e58934cb004889ba3b6b574252889284": {
+    "title": "New on the Anthropic Engineering Blog: Long-running AI agents still face challenges working across m...",
+    "link": "https://x.com/AnthropicAI/status/1993733817849303409",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 26 Nov 2025 17:29:18 GMT",
+    "cached_time": 1765180818.5934787
+  },
+  "230e758c21ab4d3be734112c15e71507": {
+    "title": "Our study has limitations: above all, Claude can’t use what happens outside of the chat window to re...",
+    "link": "https://x.com/AnthropicAI/status/1993305334484705533",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 25 Nov 2025 13:06:40 GMT",
+    "cached_time": 1765180823.537438
+  },
+  "57f7a9e84082fac689d63ab84fa87046": {
+    "title": "This result implies a doubling of the baseline labor productivity growth trend—placing our estimate ...",
+    "link": "https://x.com/AnthropicAI/status/1993305330869223463",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 25 Nov 2025 13:06:39 GMT",
+    "cached_time": 1765180830.8860075
+  },
+  "baf098f5f5eb3c030c1563f8a2b112e4": {
+    "title": "New Anthropic research: Estimating AI productivity gains from Claude conversations.\n\nThe Anthropic E...",
+    "link": "https://x.com/AnthropicAI/status/1993305312305009133",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 25 Nov 2025 13:06:34 GMT",
+    "cached_time": 1765180838.8362143
+  },
+  "ab0024e393d03cf81a8ba6c58b477805": {
+    "title": "We're proud to partner with @ENERGY and the Trump Administration on the Genesis Mission.\n\nBy combini...",
+    "link": "https://x.com/AnthropicAI/status/1993103199029674175",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Mon, 24 Nov 2025 23:43:27 GMT",
+    "cached_time": 1765180850.715568
+  },
+  "8452a39f47e21e3768c900ba34ed079a": {
+    "title": "We have been using inoculation prompting in production Claude training. We recommend its use as a ba...",
+    "link": "https://x.com/AnthropicAI/status/1991952436207243667",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Fri, 21 Nov 2025 19:30:44 GMT",
+    "cached_time": 1765180858.49566
+  },
+  "738480809ce705c1a7d652c10335835a": {
+    "title": "For more on our results, read our blog post: https://t.co/GLV9GcgvO6\n\nAnd read our paper: https://t....",
+    "link": "https://x.com/AnthropicAI/status/1991952438522527943",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Fri, 21 Nov 2025 19:30:44 GMT",
+    "cached_time": 1765180864.4473944
+  },
+  "f25a805fdb57ae7fb16f8ac2608bb9c8": {
+    "title": "New Anthropic research: Natural emergent misalignment from reward hacking in production RL.\n\n“Reward...",
+    "link": "https://x.com/AnthropicAI/status/1991952400899559889",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Fri, 21 Nov 2025 19:30:35 GMT",
+    "cached_time": 1765180872.0219424
+  },
+  "5c8f54b37662fdde5a383c0c062bade6": {
+    "title": "Dario Amodei (Anthropic), Satya Nadella (Microsoft), and Jensen Huang (NVIDIA) discuss our new partn...",
+    "link": "https://x.com/AnthropicAI/status/1990797993281536420",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 18 Nov 2025 15:03:23 GMT",
+    "cached_time": 1765180877.1818957
+  },
+  "eebdf63ba62f9b10bb088ffb14681c1d": {
+    "title": "We’ve formed a partnership with NVIDIA and Microsoft.\n\nClaude is now on Azure—making ours the only f...",
+    "link": "https://x.com/AnthropicAI/status/1990797990064500776",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 18 Nov 2025 15:03:22 GMT",
+    "cached_time": 1765180883.2298555
+  },
+  "9ca20a47f275c2993fde412436557bf5": {
+    "title": "We’re partnering with the Government of Rwanda and @ALX_Africa to bring Chidi, a learning companion ...",
+    "link": "https://x.com/AnthropicAI/status/1990420394575053044",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Mon, 17 Nov 2025 14:02:56 GMT",
+    "cached_time": 1765180888.1170502
+  },
+  "dbd82f974096bc3e3e0251a1f93fbe33": {
+    "title": "You can find the materials for our open-source political bias evaluation here: https://t.co/wPjkLlRD...",
+    "link": "https://x.com/AnthropicAI/status/1989078050773037258",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Thu, 13 Nov 2025 21:08:57 GMT",
+    "cached_time": 1765180892.3863516
+  },
+  "6ff50f1aed08a5007eb69ad9427e795e": {
+    "title": "We’re open-sourcing an evaluation used to test Claude for political bias.\n\nIn the post below, we des...",
+    "link": "https://x.com/AnthropicAI/status/1989076472208978127",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Thu, 13 Nov 2025 21:02:40 GMT",
+    "cached_time": 1765180897.2331924
+  },
+  "39e84c36643883cd7a625cef39cdb971": {
+    "title": "We believe this is the first documented case of a large-scale AI cyberattack executed without substa...",
+    "link": "https://x.com/AnthropicAI/status/1989033795341648052",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Thu, 13 Nov 2025 18:13:05 GMT",
+    "cached_time": 1765180901.218064
+  },
+  "be93b35d72316e143a96fa0081c64598": {
+    "title": "We disrupted a highly sophisticated AI-led espionage campaign.\n\nThe attack targeted large tech compa...",
+    "link": "https://x.com/AnthropicAI/status/1989033793190277618",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Thu, 13 Nov 2025 18:13:05 GMT",
+    "cached_time": 1765180908.4223204
+  },
+  "03bdbc338276a15b9e85fc6dadb1781d": {
+    "title": "We’re partnering with the state of Maryland to bring Claude to its government services.\n\nClaude will...",
+    "link": "https://x.com/AnthropicAI/status/1988999851905020395",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Thu, 13 Nov 2025 15:58:13 GMT",
+    "cached_time": 1765180914.4622216
+  },
+  "550e456b860593057b7c573ffa4f303b": {
+    "title": "And you can watch our mini-documentary about Project Fetch on YouTube: https://t.co/P67RUpXFLC",
+    "link": "https://x.com/AnthropicAI/status/1988706414777323874",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 12 Nov 2025 20:32:12 GMT",
+    "cached_time": 1765180918.7604237
+  },
+  "f78426e4285ca030a6b263dc6bd92c47": {
+    "title": "Read the full write-up of Project Fetch: https://t.co/6wIcqnKM71",
+    "link": "https://x.com/AnthropicAI/status/1988706412395106781",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 12 Nov 2025 20:32:11 GMT",
+    "cached_time": 1765180924.3976207
+  },
+  "e8330b8ac8de70573a15448210340f57": {
+    "title": "New Anthropic research: Project Fetch.\n\nWe asked two teams of Anthropic researchers to program a rob...",
+    "link": "https://x.com/AnthropicAI/status/1988706380480385470",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 12 Nov 2025 20:32:04 GMT",
+    "cached_time": 1765180931.0108864
+  },
+  "92e11f1cdfb1ece75bc11073c61018e3": {
+    "title": "For the first time, Anthropic is building its own AI infrastructure.\n\nWe’re constructing data center...",
+    "link": "https://x.com/AnthropicAI/status/1988624013849935995",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 12 Nov 2025 15:04:46 GMT",
+    "cached_time": 1765180934.995622
+  },
+  "659f52dc4887f7bfce3447d56910a47f": {
+    "title": "We’re opening offices in Paris and Munich.\n\nEMEA has become our fastest-growing region, with a run-r...",
+    "link": "https://x.com/AnthropicAI/status/1986871933967745344",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Fri, 07 Nov 2025 19:02:38 GMT",
+    "cached_time": 1765180941.647262
+  },
+  "732b5e77444c2ffda62191a2a5bd232d": {
+    "title": "New on the Anthropic Engineering blog: tips on how to build more efficient agents that handle more t...",
+    "link": "https://x.com/AnthropicAI/status/1985846791842250860",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 04 Nov 2025 23:09:05 GMT",
+    "cached_time": 1765180947.6428232
+  },
+  "22d33bdb003bc944f7a35519de661d27": {
+    "title": "Even when new AI models bring clear improvements in capabilities, deprecating the older generations ...",
+    "link": "https://x.com/AnthropicAI/status/1985752012189728939",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 04 Nov 2025 16:52:27 GMT",
+    "cached_time": 1765180955.75973
+  },
+  "b3aaad7490ae2b53a43ddbaaa67b9385": {
+    "title": "We're announcing a partnership with Iceland's Ministry of Education and Children to bring Claude to ...",
+    "link": "https://x.com/AnthropicAI/status/1985612560255893693",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 04 Nov 2025 07:38:19 GMT",
+    "cached_time": 1765180960.6108856
+  },
+  "70edb20fc2248955a11febe89b810030": {
+    "title": "For more of Anthropic’s alignment research, see our Alignment Science blog: https://t.co/0UHuZdvWd9",
+    "link": "https://x.com/AnthropicAI/status/1985505335256215917",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 04 Nov 2025 00:32:15 GMT",
+    "cached_time": 1765180965.9522119
+  },
+  "84c16f62fa1111e1b18e6eea997a592d": {
+    "title": "Current language models struggle to reason in ciphered language, led by Jeff Guo.\n\nTraining or promp...",
+    "link": "https://x.com/AnthropicAI/status/1985505333125484552",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 04 Nov 2025 00:32:14 GMT",
+    "cached_time": 1765180974.2495966
+  },
+  "ee8844255545c50f93e3bcb20f828936": {
+    "title": "The Anthropic Fellows program provides funding and mentorship for a small cohort of AI safety resear...",
+    "link": "https://x.com/AnthropicAI/status/1985505322522296542",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Tue, 04 Nov 2025 00:32:12 GMT",
+    "cached_time": 1765180980.304194
+  },
+  "8bf07208f45c96233a18527179daee34": {
+    "title": "The full paper is available here: https://t.co/N7erwdYyDw\n\nWe're hiring researchers and engineers to...",
+    "link": "https://x.com/AnthropicAI/status/1983584162960597491",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 29 Oct 2025 17:18:12 GMT",
+    "cached_time": 1765180986.042641
+  },
+  "8cf435538482f88c7a2079fac5470b22": {
+    "title": "Our blog post on these results is here: https://t.co/9ZoVJFovJr",
+    "link": "https://x.com/AnthropicAI/status/1983584161463202073",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 29 Oct 2025 17:18:11 GMT",
+    "cached_time": 1765180991.086603
+  },
+  "9ba806aedda21b45934f023f6b4fdab7": {
+    "title": "Note that our experiments do not address the question of whether AI models can have subjective exper...",
+    "link": "https://x.com/AnthropicAI/status/1983584158481051660",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 29 Oct 2025 17:18:11 GMT",
+    "cached_time": 1765180995.7031646
+  },
+  "a3ce4533290a15e7824cecae8530d1f5": {
+    "title": "In general, Claude Opus 4 and 4.1, the most capable models we tested, performed best in our tests of...",
+    "link": "https://x.com/AnthropicAI/status/1983584155528262002",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 29 Oct 2025 17:18:10 GMT",
+    "cached_time": 1765181001.8096263
+  },
+  "d37e9705df0654068c1f7a9694470c8a": {
+    "title": "We also found evidence for cognitive control, where models deliberately \"think about\" something. For...",
+    "link": "https://x.com/AnthropicAI/status/1983584152604831851",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 29 Oct 2025 17:18:09 GMT",
+    "cached_time": 1765181008.3413954
+  },
+  "3b075ab894a4973495c0196f9ea91021": {
+    "title": "In one experiment, we asked the model to detect when a concept is injected into its “thoughts.” When...",
+    "link": "https://x.com/AnthropicAI/status/1983584141909389542",
+    "author": "Anthropic (@AnthropicAI)",
+    "published": "Wed, 29 Oct 2025 17:18:07 GMT",
+    "cached_time": 1765181014.7401168
+  },
+  "8d8c6b5bffe640e4d88c1731983625b7": {
+    "title": "Confessions don’t prevent mistakes; they make them visible. \n\nNext, we’re scaling the approach and c...",
+    "link": "https://x.com/OpenAI/status/1996281181130956995",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 03 Dec 2025 18:11:37 GMT",
+    "cached_time": 1765181023.8576279
+  },
+  "450649a2f6a3100bc6a72e2af846c974": {
+    "title": "We trained a variant of GPT-5 Thinking to produce two outputs:\n(1) the main answer you see.\n(2) a co...",
+    "link": "https://x.com/OpenAI/status/1996281175770599447",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 03 Dec 2025 18:11:36 GMT",
+    "cached_time": 1765181032.5932572
+  },
+  "0f9402943a008e89e27a38b37f03b8bf": {
+    "title": "In our tests, we found that the confessions method significantly improves the visibility of model mi...",
+    "link": "https://x.com/OpenAI/status/1996281178668876214",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 03 Dec 2025 18:11:36 GMT",
+    "cached_time": 1765181040.20393
+  },
+  "83879317ee07f8d874ef138efaf0eafd": {
+    "title": "In a new proof-of-concept study, we’ve trained a GPT-5 Thinking variant to admit whether the model f...",
+    "link": "https://x.com/OpenAI/status/1996281172377436557",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 03 Dec 2025 18:11:35 GMT",
+    "cached_time": 1765181046.6463706
+  },
+  "97a822dfd33785c54a23ab3aa901e570": {
+    "title": "AI systems are becoming more capable, and we want to understand them as deeply as possible—including...",
+    "link": "https://x.com/OpenAI/status/1996281173962801429",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 03 Dec 2025 18:11:35 GMT",
+    "cached_time": 1765181052.4927437
+  },
+  "9448ef6e30ab964697df0de5fee30877": {
+    "title": "The OpenAI Foundation names the first People-First AI Fund recipients: 208 community-based nonprofit...",
+    "link": "https://x.com/OpenAI/status/1996258322304155695",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 03 Dec 2025 16:40:47 GMT",
+    "cached_time": 1765181057.223464
+  },
+  "61c8e2e5c3c8bbdf3f7b47d32211d67f": {
+    "title": "Listen to the OpenAI Podcast on—\nSpotify\nhttps://t.co/hLcRdGrfUX\nApple\nhttps://t.co/0AdZ1ZteOV\nYouTu...",
+    "link": "https://x.com/OpenAI/status/1995923133451350320",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Tue, 02 Dec 2025 18:28:52 GMT",
+    "cached_time": 1765181064.9453132
+  },
+  "cb947d404c81be35890329d469e16bec": {
+    "title": "Now that you’ve had the chance to get to know GPT-5.1, we pull back the curtain on how training took...",
+    "link": "https://x.com/OpenAI/status/1995923127982019030",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Tue, 02 Dec 2025 18:28:50 GMT",
+    "cached_time": 1765181070.430526
+  },
+  "4603285a449fb48c510d367119c3baaf": {
+    "title": "If you prefer the original experience, turn on “Separate mode” under Settings → Voice Mode.",
+    "link": "https://x.com/OpenAI/status/1993381103189868992",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Tue, 25 Nov 2025 18:07:44 GMT",
+    "cached_time": 1765181075.2280107
+  },
+  "1535cb565d217360c2cf98a37dad065b": {
+    "title": "You can now use ChatGPT Voice right inside chat—no separate mode needed.\n\nYou can talk, watch answer...",
+    "link": "https://x.com/OpenAI/status/1993381101369458763",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Tue, 25 Nov 2025 18:07:44 GMT",
+    "cached_time": 1765181081.1839495
+  },
+  "b0fa91776f1ada8e852d8c838be59280": {
+    "title": "Rollout complete!",
+    "link": "https://x.com/OpenAI/status/1993184575741477341",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Tue, 25 Nov 2025 05:06:49 GMT",
+    "cached_time": 1765181086.1845338
+  },
+  "2563c174f514b9dc3f94778a9a55348d": {
+    "title": "@onepeloton @Tripadvisor @Target is now available as an app in ChatGPT",
+    "link": "https://x.com/OpenAI/status/1993125078436135008",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Tue, 25 Nov 2025 01:10:23 GMT",
+    "cached_time": 1765181093.1807265
+  },
+  "a6abe42d3a8e80a5ffef4c579492a5af": {
+    "title": "Shopping research is starting to roll out today on mobile and web for logged-in ChatGPT users on Fre...",
+    "link": "https://x.com/OpenAI/status/1993018366928560514",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Mon, 24 Nov 2025 18:06:21 GMT",
+    "cached_time": 1765181098.7616503
+  },
+  "40f08879a6c310e5587c7e0a0cbadca0": {
+    "title": "To help with holiday shopping, we’re making usage for shopping research in ChatGPT nearly unlimited ...",
+    "link": "https://x.com/OpenAI/status/1993018365397680263",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Mon, 24 Nov 2025 18:06:21 GMT",
+    "cached_time": 1765181105.740057
+  },
+  "45c4e180fcd4f19aa77d817cbcb9c887": {
+    "title": "Introducing shopping research, a new experience in ChatGPT that does the research to help you find t...",
+    "link": "https://x.com/OpenAI/status/1993018357432586391",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Mon, 24 Nov 2025 18:06:19 GMT",
+    "cached_time": 1765181110.2781904
+  },
+  "9c2b622dc276d0adde44a98d448f7e26": {
+    "title": "Instant Checkout is now rolling out for @Shopify  merchants starting with Glossier, SKIMS, and Spanx...",
+    "link": "https://x.com/OpenAI/status/1991646997322035520",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 20 Nov 2025 23:17:01 GMT",
+    "cached_time": 1765181116.2002606
+  },
+  "12b5c40a8a1f406c4a8527ff40732dfd": {
+    "title": "We’ve expanded access to localized crisis helplines in ChatGPT. \n\nWhen our systems detect potential ...",
+    "link": "https://x.com/OpenAI/status/1991634046624116784",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 20 Nov 2025 22:25:34 GMT",
+    "cached_time": 1765181125.5365736
+  },
+  "b2ae81e9b5db5279888ab2ca1b384d1e": {
+    "title": "Listen to the OpenAI Podcast on—\n\nSpotify\nhttps://t.co/hLcRdGrfUX\n\nApple\nhttps://t.co/0AdZ1ZteOV\n\nYo...",
+    "link": "https://x.com/OpenAI/status/1991570423621026024",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 20 Nov 2025 18:12:45 GMT",
+    "cached_time": 1765181133.9794333
+  },
+  "d6f5712fd9f26728bf4e97d791d26407": {
+    "title": "We’re also releasing new research on how GPT-5 is accelerating scientific discovery.\n\nOur new paper,...",
+    "link": "https://x.com/OpenAI/status/1991570422148788612",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 20 Nov 2025 18:12:44 GMT",
+    "cached_time": 1765181145.30773
+  },
+  "65427f04c00f7f8b6114e660ac07afd8": {
+    "title": "Science underpins medicine, energy, and national security, yet progress remains slow. Early experime...",
+    "link": "https://x.com/OpenAI/status/1991569987933458814",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 20 Nov 2025 18:11:01 GMT",
+    "cached_time": 1765181149.6825109
+  },
+  "76253a6889f7bf82a924b4894ab57170": {
+    "title": "https://t.co/jusfSiaEPf",
+    "link": "https://x.com/OpenAI/status/1991556365106704553",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 20 Nov 2025 17:16:53 GMT",
+    "cached_time": 1765181156.6936352
+  },
+  "a1db996ab151e908611a2f6c5463b612": {
+    "title": "Group chats in ChatGPT are now rolling out globally.\n\nAfter a successful pilot with early testers, g...",
+    "link": "https://x.com/OpenAI/status/1991556363420594270",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 20 Nov 2025 17:16:53 GMT",
+    "cached_time": 1765181162.1565857
+  },
+  "f0b6142c46a978f77d5411672285b776": {
+    "title": "GPT-5.1 Pro is rolling out today to all Pro users.\n\nIt delivers clearer, more capable answers for co...",
+    "link": "https://x.com/OpenAI/status/1991266192905179613",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 19 Nov 2025 22:03:50 GMT",
+    "cached_time": 1765181169.8291771
+  },
+  "6359c6ee216a3d9c41c0591f5cf428c5": {
+    "title": "With ChatGPT for Teachers, educators can securely work with classroom materials and student info and...",
+    "link": "https://x.com/OpenAI/status/1991218199787106805",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 19 Nov 2025 18:53:08 GMT",
+    "cached_time": 1765181176.8538666
+  },
+  "498bb3aff704cba28a0973321b5be592": {
+    "title": "Introducing ChatGPT for Teachers—a secure ChatGPT workspace built for educators, with admin controls...",
+    "link": "https://x.com/OpenAI/status/1991218197530378431",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 19 Nov 2025 18:53:07 GMT",
+    "cached_time": 1765181187.1688294
+  },
+  "58aca13f10c46938f0445bef1c2b4905": {
+    "title": "Listen to the OpenAI Podcast on—\nSpotify\nhttps://t.co/hLcRdGrfUX\nApple\nhttps://t.co/0AdZ1ZteOV\nYouTu...",
+    "link": "https://x.com/OpenAI/status/1990491021042725226",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Mon, 17 Nov 2025 18:43:35 GMT",
+    "cached_time": 1765181192.5225008
+  },
+  "a9f81f04714e084e8646f6c75eb6eff6": {
+    "title": "Ever wonder what it takes to reinvent a browser from the inside out?\n\n@BenGoodger and @Darinwf join ...",
+    "link": "https://x.com/OpenAI/status/1990490965560471688",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Mon, 17 Nov 2025 18:43:22 GMT",
+    "cached_time": 1765181197.6498027
+  },
+  "e83263b05e0bdb5d0c647787eeecfe42": {
+    "title": "Rolling out now to Free, Go, Plus, and Pro users in Japan, New Zealand, South Korea, and Taiwan on b...",
+    "link": "https://x.com/OpenAI/status/1989138779781881882",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Fri, 14 Nov 2025 01:10:16 GMT",
+    "cached_time": 1765181203.5935478
+  },
+  "5cc20177971c63cf2ec117305e524e7a": {
+    "title": "Group chats in ChatGPT are now piloting in Japan, New Zealand, South Korea, and Taiwan.\n\nA new way t...",
+    "link": "https://x.com/OpenAI/status/1989138776585851038",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Fri, 14 Nov 2025 01:10:15 GMT",
+    "cached_time": 1765181209.083737
+  },
+  "3dc647ef48706fc91d606a5184f130ab": {
+    "title": "This is an early step; there is a long path from this work to fully understanding the complex behavi...",
+    "link": "https://x.com/OpenAI/status/1989036220266250729",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 13 Nov 2025 18:22:44 GMT",
+    "cached_time": 1765181213.7485611
+  },
+  "ce810015fae64f1bfb6b031db99ee72c": {
+    "title": "Unlike with normal models, we often find that we can pull out simple, understandable parts of our sp...",
+    "link": "https://x.com/OpenAI/status/1989036218160673103",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 13 Nov 2025 18:22:43 GMT",
+    "cached_time": 1765181218.9691653
+  },
+  "b0917262b157fca7569fa5c4a6ef118d": {
+    "title": "We’ve developed a new way to train small AI models with internal mechanisms that are easier for huma...",
+    "link": "https://x.com/OpenAI/status/1989036214549414223",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 13 Nov 2025 18:22:42 GMT",
+    "cached_time": 1765181225.700675
+  },
+  "dfa641b4dc8a7b2b108f24787b27f065": {
+    "title": "Reddit AMA on GPT-5.1 and our customization updates.\n\nTomorrow, 2PM PT.\nhttps://t.co/9WfAa5GVXw",
+    "link": "https://x.com/OpenAI/status/1988747732614517233",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 12 Nov 2025 23:16:23 GMT",
+    "cached_time": 1765181231.065814
+  },
+  "5637250bb3ccd1000db9cfeb29e467a4": {
+    "title": "8 unique chat styles are now in your ChatGPT personalization tab, making it easier to set the tone a...",
+    "link": "https://x.com/OpenAI/status/1988719701527261631",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 12 Nov 2025 21:25:00 GMT",
+    "cached_time": 1765181238.1043115
+  },
+  "7bc0c49a9286a33a539181268dd46895": {
+    "title": "We’re also experimenting with more personalization controls, like tuning warmth ☀️ and emoji frequen...",
+    "link": "https://x.com/OpenAI/status/1988719702856925259",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 12 Nov 2025 21:25:00 GMT",
+    "cached_time": 1765181243.3308566
+  },
+  "913eb1a79f39572015a3316f0c3338c4": {
+    "title": "GPT-5 will remain available to paid subscribers for three months.\n\nThe GPT-5 sunset period does not ...",
+    "link": "https://x.com/OpenAI/status/1988714380205388130",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 12 Nov 2025 21:03:51 GMT",
+    "cached_time": 1765181249.6690018
+  },
+  "54e85d7717e1e2a85e65c57a4ab438aa": {
+    "title": "GPT-5.1 Thinking now more effectively adjusts its thinking time based on the question, spending more...",
+    "link": "https://x.com/OpenAI/status/1988714377814614424",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 12 Nov 2025 21:03:50 GMT",
+    "cached_time": 1765181262.6742842
+  },
+  "4c5a7f4d2eb7e93c7a756c431786324e": {
+    "title": "GPT-5.1 in ChatGPT is rolling out to all users this week.\n\nIt’s smarter, more reliable, and a lot mo...",
+    "link": "https://x.com/OpenAI/status/1988714373058351213",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 12 Nov 2025 21:03:49 GMT",
+    "cached_time": 1765181269.2354515
+  },
+  "5906bbfc5ec4a114e545fd568bd0535b": {
+    "title": "A letter from our CISO: \"Fighting the New York Times’ invasion of user privacy\" \nhttps://t.co/sa261S...",
+    "link": "https://x.com/OpenAI/status/1988611982216572978",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 12 Nov 2025 14:16:57 GMT",
+    "cached_time": 1765181276.241608
+  },
+  "2a41ec362605d1bea984a68e4a6ebac3": {
+    "title": "@onepeloton  and @Tripadvisor are now available as apps in ChatGPT.",
+    "link": "https://x.com/OpenAI/status/1986508218726781001",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 06 Nov 2025 18:57:21 GMT",
+    "cached_time": 1765181283.114561
+  },
+  "55e7b7f4da564d8124e77b9b4b9c6725": {
+    "title": "You can now interrupt long-running queries and add new context without restarting or losing progress...",
+    "link": "https://x.com/OpenAI/status/1986194298971590988",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 05 Nov 2025 22:09:57 GMT",
+    "cached_time": 1765181288.5310185
+  },
+  "730e4327273bddd34bcc6538bc3f4c43": {
+    "title": "Introducing IndQA — a new benchmark that evaluates how well AI systems understand Indian languages a...",
+    "link": "https://x.com/OpenAI/status/1985950264525013210",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 05 Nov 2025 06:00:14 GMT",
+    "cached_time": 1765181293.1278682
+  },
+  "be9d5b0787d13edaeb448e56b3686713": {
+    "title": "Happy Halloween from Sora and the monsters of Monster Manor.\n\nCreated using characters, now availabl...",
+    "link": "https://x.com/OpenAI/status/1984318204374892798",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Fri, 31 Oct 2025 17:55:01 GMT",
+    "cached_time": 1765181297.4425952
+  },
+  "04b816c19c5dad528ace4ad561d2b60a": {
+    "title": "Turn on agent mode and ChatGPT can take action for you—research, plan, and get things done while you...",
+    "link": "https://x.com/OpenAI/status/1984304194837528864",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Fri, 31 Oct 2025 16:59:21 GMT",
+    "cached_time": 1765181302.8232343
+  },
+  "7f39560de3769b09dd02cfee5337e1dc": {
+    "title": "Now in private beta: Aardvark, an agent that finds and fixes security bugs using GPT-5.\n\nhttps://t.c...",
+    "link": "https://x.com/OpenAI/status/1983956431360659467",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 30 Oct 2025 17:57:28 GMT",
+    "cached_time": 1765181314.8661232
+  },
+  "631cec7983753ca85da20c63180d0dea": {
+    "title": "3. Vietnam",
+    "link": "https://x.com/OpenAI/status/1983731135403491805",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 30 Oct 2025 03:02:13 GMT",
+    "cached_time": 1765181320.9139783
+  },
+  "8e1e1a08bf821e26535a669915682226": {
+    "title": "2. Taiwan",
+    "link": "https://x.com/OpenAI/status/1983731061965345265",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 30 Oct 2025 03:01:55 GMT",
+    "cached_time": 1765181324.3170433
+  },
+  "87a7857291c06535c42cbd444f57b86f": {
+    "title": "The Sora app is available in three more places, as shared by @sama.\n\n1. Thailand",
+    "link": "https://x.com/OpenAI/status/1983730999482872195",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Thu, 30 Oct 2025 03:01:40 GMT",
+    "cached_time": 1765181330.1680057
+  },
+  "b0c4b67498a4249d13a98759ca8564e8": {
+    "title": "You can now get into the Sora app without an invite code in the US, Canada, Japan, and Korea.\n\nLimit...",
+    "link": "https://x.com/OpenAI/status/1983662144437748181",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 29 Oct 2025 22:28:04 GMT",
+    "cached_time": 1765181334.661024
+  },
+  "4e4ff634047383770b266fe78c33d3a3": {
+    "title": "And there’s more—stitching and leaderboard, now in the Sora app.",
+    "link": "https://x.com/OpenAI/status/1983661182159614395",
+    "author": "OpenAI (@OpenAI)",
+    "published": "Wed, 29 Oct 2025 22:24:15 GMT",
+    "cached_time": 1765181340.2199993
+  },
+  "3ff1bd468b7a01c0a37f4d7b8a3d6e8c": {
+    "title": "🍌 Nano Banana Pro 提示词：任何爱好或者职业的进阶之路\n\n用非常可爱的黏土风格展示不同等级的标准和消耗时间\n\n-------提示词--------\n\n基于主题 [前端工程师的进阶之路...",
+    "link": "https://x.com/op7418/status/1997722842042085409",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 17:40:16 GMT",
+    "cached_time": 1765181354.6614728
+  },
+  "f3d66d76607fe2ff52c5436621c885e1": {
+    "title": "四象限排行：https://t.co/TFbf12YUef",
+    "link": "https://x.com/op7418/status/1997717970223771966",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 17:20:54 GMT",
+    "cached_time": 1765181362.795215
+  },
+  "c237b43ccf4378f72ee40610b2d13150": {
+    "title": "从夯到拉排行：https://t.co/TvAn8zHk1V",
+    "link": "https://x.com/op7418/status/1997717920873668983",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 17:20:42 GMT",
+    "cached_time": 1765181372.7787604
+  },
+  "decb67acd78d027901f7c26041b0aace": {
+    "title": "还有一个锐评无畏契约皮肤的",
+    "link": "https://x.com/op7418/status/1997716586493575540",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 17:15:24 GMT",
+    "cached_time": 1765181380.051851
+  },
+  "90beef562db24fbf61bef4c098c466eb": {
+    "title": "爆款预定！🍌Nano Banana Pro 锐评世间万物！\n\n随便给一个领域让大香蕉给这个领域从夯到拉打分\n\n这个玩法最近巨火，我们的图也非常漂亮，AI 生成的出人意料会很有话题度\n\n是引战、反串、...",
+    "link": "https://x.com/op7418/status/1997715077789897182",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 17:09:24 GMT",
+    "cached_time": 1765181389.552273
+  },
+  "254145822c0b98c8bbdcfd03dca0dc9d": {
+    "title": "3:4 效果更好",
+    "link": "https://x.com/op7418/status/1997708273076879855",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 16:42:22 GMT",
+    "cached_time": 1765181399.6834133
+  },
+  "d9616315871c33777c567106c5b5275d": {
+    "title": "Nano  Banana Pro 超级提示词！\n\n帮你做任何商品的购买决策，生成任何需要对比的产品类型的 4 象限图片\n\n无论是饮品、电动车、自行车还是咖啡店，你可以直接化身这个品类的专家\n\n话题度和...",
+    "link": "https://x.com/op7418/status/1997706102709145704",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 16:33:45 GMT",
+    "cached_time": 1765181408.3074307
+  },
+  "1dd29e9386140dc397fef4728ecda21d": {
+    "title": "修正错别字：帮顶➡️绑定",
+    "link": "https://x.com/op7418/status/1997664281924383226",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 13:47:34 GMT",
+    "cached_time": 1765181413.556844
+  },
+  "99a96cbbbeb653558a3b2742e7c8e998": {
+    "title": "这周最牛批的 AI 视频，几乎在所有平台爆火，强烈推荐看看，太顶了！\n\n完美的创意和完美的执行，节奏精凑而且丰富，音乐也增色了非常多\n\n看完根本不会意识到这个视频有 7 分钟这么长\n\n其中核心概念箭头...",
+    "link": "https://x.com/op7418/status/1997661107587105270",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 13:34:57 GMT",
+    "cached_time": 1765181419.8149593
+  },
+  "2e6f23b5bcf3a614fe09652bd605dce2": {
+    "title": "MKBHD 体验小米 SU7\n\nYoutube 一天就干到了 360 万播放，推特曝光 700 多万了，最近这车在海外热度确实高，福特 CEO 也在吹",
+    "link": "https://x.com/op7418/status/1997504092328108084",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 03:11:02 GMT",
+    "cached_time": 1765181436.849134
+  },
+  "7dcc2d40c8c7727dd75a0b8f1a8eb7cb": {
+    "title": "GPT‑5.2 已就绪，目标为 12 月 9 日，但可能因变动略延后。\n\nSam 是真没活了",
+    "link": "https://x.com/op7418/status/1997501502320173470",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sun, 07 Dec 2025 03:00:44 GMT",
+    "cached_time": 1765181442.5350237
+  },
+  "651e4f07f896aa3bb821fd89b82e6c28": {
+    "title": "回顾一下原则：https://t.co/RbiuQshSBu",
+    "link": "https://x.com/op7418/status/1997285178998448136",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sat, 06 Dec 2025 12:41:09 GMT",
+    "cached_time": 1765181455.4507687
+  },
+  "b83037565bd0cfc3128bbac8ede717b2": {
+    "title": "很多朋友要我这个 Nano Banana Pro 生成信息图的提示词\n\n其实非常简单，跟他说：\n\n“用浮世绘+茶杯头的风格为下面的内容生成信息图” 就可以了",
+    "link": "https://x.com/op7418/status/1997283261064925190",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sat, 06 Dec 2025 12:33:31 GMT",
+    "cached_time": 1765181465.2292488
+  },
+  "cd6de3f6f72e8f88564446b420b6124a": {
+    "title": "可爱的睡眠报告海报（Sleep Report Poster）\n\n任务： 海报设计、睡眠数据可视化艺术。 第一步： 分析 [上传的 Apple Watch 睡眠数据截图]，提取清醒、REM、核心、深睡四...",
+    "link": "https://x.com/op7418/status/1997274962021728447",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sat, 06 Dec 2025 12:00:33 GMT",
+    "cached_time": 1765181477.5667167
+  },
+  "22b660070545de39750effed433121de": {
+    "title": "Nana Banana Pro 提示词，这个超好玩！\n\n可爱的睡眠报告海报（Sleep Report Poster）\n\n将提示词和睡眠数据截图发给 Nana Banana 就行，Q 版小人和每层高度会...",
+    "link": "https://x.com/op7418/status/1997274785232101723",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sat, 06 Dec 2025 11:59:51 GMT",
+    "cached_time": 1765181490.3960254
+  },
+  "75713c59e5e0724c73607bfb2498c4fe": {
+    "title": "NotebookLM 移动端史诗级更新，基本拉齐网页端体验！\n\n支持信息图以及 Nano Banana Pro 驱动的 PPT 生成；\n\n支持直接拍摄或者从手机上传图片作为文件来源。\n\n支持云端保存音...",
+    "link": "https://x.com/op7418/status/1997265866115952714",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Sat, 06 Dec 2025 11:24:24 GMT",
+    "cached_time": 1765181499.257584
+  },
+  "199e61fddfdd1a8000e33d580a92c052": {
+    "title": "终于跑了一个问题：https://t.co/l21WwaSug9",
+    "link": "https://x.com/op7418/status/1996979603886559236",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 16:26:54 GMT",
+    "cached_time": 1765181504.990201
+  },
+  "0853c9872477bd8ffd11373104cba54a": {
+    "title": "Gemini 3 Deep Think 的预测\nhttps://t.co/4MwBR3OrIi",
+    "link": "https://x.com/op7418/status/1996979395232399438",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 16:26:04 GMT",
+    "cached_time": 1765181511.0384452
+  },
+  "e52a653bfed24ceee5a3b0182bc2cc71": {
+    "title": "刚好谷歌今天发布了他们最强力的模式 Gemini 3 驱动的 Deep think \n\n让他基于 OpenRouter 这个报告分析了一下 2026 年的 AI 行业发展趋势。\n\n最后两个我觉得挺新的...",
+    "link": "https://x.com/op7418/status/1996978652706492723",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 16:23:07 GMT",
+    "cached_time": 1765181521.4377432
+  },
+  "f7c68befa226d654262cceed57490230": {
+    "title": "并不是所有新模型都能留住用户。\n\n只有当一个新模型率先解决了某类此前无法解决的痛点（就像灰姑娘穿上了合适的水晶鞋），它才能锁定一批高粘性的“奠基用户群”（Foundational Cohorts）。",
+    "link": "https://x.com/op7418/status/1996977111933083874",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 16:17:00 GMT",
+    "cached_time": 1765181526.636545
+  },
+  "f405cc61193647320613ce549dc750ae": {
+    "title": "详情：https://t.co/OxjPaZmd6m",
+    "link": "https://x.com/op7418/status/1996962561271779834",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 15:19:11 GMT",
+    "cached_time": 1765181535.025907
+  },
+  "c50efc7fdf44f895d6d0e87fd6ca3a06": {
+    "title": "OpenRouter 分析最近13个月的数据，总量超100万亿token。\n\n发布的人工智能现状的报告。\n\n对于理解当前的人工智能采用程度和发展，这份报告还是挺重要的。\n\n---------其中最重要...",
+    "link": "https://x.com/op7418/status/1996962439733432783",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 15:18:42 GMT",
+    "cached_time": 1765181543.3444767
+  },
+  "195cd1959e52985b64258229f638d5b5": {
+    "title": "教程在这里：https://t.co/BkCYFrGSOI",
+    "link": "https://x.com/op7418/status/1996932880162005315",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 13:21:14 GMT",
+    "cached_time": 1765181553.4131622
+  },
+  "355d284bdcc0e18986503a7ae9aef39f": {
+    "title": "如果想要看更详细的长文在这里：\n\nhttps://t.co/hNcG5cLyvC",
+    "link": "https://x.com/op7418/status/1996931158618349937",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 13:14:24 GMT",
+    "cached_time": 1765181559.521658
+  },
+  "dfb51cd07a002140b420ca5d0972f733": {
+    "title": "展示 3D 模型及数据\n\n这里藏师傅已经写好工具了（ai. studio/apps/drive/147nALZ5hoyMlk8H0l0Ge-AWHOkJ7vHh7），你点进去直接用就行。\n\n首先点击“...",
+    "link": "https://x.com/op7418/status/1996930932235030747",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 13:13:30 GMT",
+    "cached_time": 1765181568.23281
+  },
+  "6761ce1e82583a4563468c31b0403734": {
+    "title": "终于肝出来了！藏师傅这几天的“科研成果”\n\n用 Nano Banana Pro 帮你展示你的户外运动成果，具体包含：\n\n- 四套户外运动海报提示词\n- 如何从海报图片生成 3D Q 版模型\n- 如何用...",
+    "link": "https://x.com/op7418/status/1996929968685863135",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 13:09:40 GMT",
+    "cached_time": 1765181575.7535603
+  },
+  "add0d5051c5d1ccd352766e0a8233df0": {
+    "title": "Cloudflare 又 TMD 炸了，真的服了，梅开二度",
+    "link": "https://x.com/op7418/status/1996866851054538882",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 08:58:51 GMT",
+    "cached_time": 1765181582.6827118
+  },
+  "dc9afb132560dad372cf441381d849a8": {
+    "title": "加上了手势展示功能\n\nhttps://t.co/FtKPN1fbdh",
+    "link": "https://x.com/op7418/status/1996862771108233591",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 08:42:39 GMT",
+    "cached_time": 1765181587.8169894
+  },
+  "11b8609ac148553c4d2d6c918798c19b": {
+    "title": "Gemini 3 Pro 做的手势控制网页超好玩！\n\n为我的这个户外运动 3D 模型展示加上了手势控制功能\n\n手掌左滑停止旋转、右滑继续旋转、捏手指缩小、张开手掌放大",
+    "link": "https://x.com/op7418/status/1996862569068614048",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 08:41:51 GMT",
+    "cached_time": 1765181594.2714493
+  },
+  "e98299c60c1a9a9382e0122a199ab2de": {
+    "title": "这个不需要 API，想玩的话我一会发一下链接",
+    "link": "https://x.com/op7418/status/1996846628037423298",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 07:38:30 GMT",
+    "cached_time": 1765181601.1825624
+  },
+  "52126854995ac08d2e25c6078fe4b8bd": {
+    "title": "用 Nano Banana Pro 将你的徒步、骑行成绩做成藏品！\n\nGemini 3 Pro + Nano Banana Pro + 3D 生成 \n\n3D 化的动态展示骑行徒步的路线、目的地和数据\n...",
+    "link": "https://x.com/op7418/status/1996842431623668159",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 07:21:49 GMT",
+    "cached_time": 1765181609.5339212
+  },
+  "6b2d0a33c67ad3c4074b3c059a120680": {
+    "title": "GPT-5.1 Codex Max  模型 API 上线了，Cursor 等编程工具已经接入",
+    "link": "https://x.com/op7418/status/1996757975609098690",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 01:46:14 GMT",
+    "cached_time": 1765181626.7265065
+  },
+  "006f36f433cab88d39984ee2d222a40a": {
+    "title": "我操，谷歌，你是人吗？\n\n我一个月掏200多美元，你还限流不让用！",
+    "link": "https://x.com/op7418/status/1996757349571481686",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 01:43:44 GMT",
+    "cached_time": 1765181632.657557
+  },
+  "70782d11bf5c2d9db51a4013bcc64f19": {
+    "title": "一会整个恶心项目测试一下他",
+    "link": "https://x.com/op7418/status/1996756585046270364",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 01:40:42 GMT",
+    "cached_time": 1765181642.8879035
+  },
+  "dc6e305531f60e02e458df1d8d8c3bd5": {
+    "title": "详情：https://t.co/PIbRZp7sqF",
+    "link": "https://x.com/op7418/status/1996753323027034547",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 01:27:44 GMT",
+    "cached_time": 1765181649.9320652
+  },
+  "96d6b4426850aee951d430b97837e370": {
+    "title": "谷歌上线了由 Gemini 3 驱动的 Deep Think 模式\n\n直接把 ARC 2 拉到了 45.1 分，HLE 干到了 41 分，提升太离谱了\n\n目前 Ultra 用户可以用，点击左侧 Dee...",
+    "link": "https://x.com/op7418/status/1996753248481648699",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Fri, 05 Dec 2025 01:27:26 GMT",
+    "cached_time": 1765181656.2618377
+  },
+  "5130d3ea12051fa1acbda5418d7712e8": {
+    "title": "加上一个转场更自然了\n\nNano Banana Pro + Kling",
+    "link": "https://x.com/op7418/status/1996580933248385203",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 14:02:43 GMT",
+    "cached_time": 1765181665.9406126
+  },
+  "10d3d355a7381f2998bb615da18c0020": {
+    "title": "中文版本：https://t.co/rGPEuKtumf",
+    "link": "https://x.com/op7418/status/1996559866748641513",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 12:39:01 GMT",
+    "cached_time": 1765181677.2988682
+  },
+  "3143ba89b9ae1a355fef53edb2b0ed27": {
+    "title": "Nano Banana Pro Prompt:\n\n将照片放入复古诺基亚手机中，灵感来自原推，我这个会直接转换照片人像，同时增加复古 UI 增加真实感。\n\n-----------------------...",
+    "link": "https://x.com/op7418/status/1996559812948369454",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 12:38:48 GMT",
+    "cached_time": 1765181686.8128958
+  },
+  "94d36a18279c7ad38fc4708b737696a9": {
+    "title": "Nano Banana Pro Prompt: \n\nPut the photo into a vintage Nokia phone\n\nBased on the attached photo, dis...",
+    "link": "https://x.com/op7418/status/1996558272611147787",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 12:32:41 GMT",
+    "cached_time": 1765181696.9020946
+  },
+  "210faa5cd03ece0dc282d7ab21a5e78e": {
+    "title": "当然，有时候自己执行也不好，能实现就摆烂了。有些字或者有些内容可以再删减。\n\n这个产品化的时候再说吧。",
+    "link": "https://x.com/op7418/status/1996448852346626206",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 05:17:53 GMT",
+    "cached_time": 1765181702.2220793
+  },
+  "74863b5d9647692d0c9b5631d485d243": {
+    "title": "我写Nano Banana Pro提示词的两个原则：\n\n1. 尽可能的简洁，节省token，少写不必要的内容，尤其是JSON格式这类又臭又长的\n\n2. 尽可能地支持更多的场景和能力，让模型自行判断需要...",
+    "link": "https://x.com/op7418/status/1996446854167539911",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 05:09:56 GMT",
+    "cached_time": 1765181709.8284295
+  },
+  "3c87d958c0d1b4c78e579418dba42903": {
+    "title": "关于 Open AI 代号 Garlic（大蒜🧄）的模型 Chris 说不会在近期推出\n\n他们下周会发布一个模型但不是大蒜，大蒜预计会在明年上半年推出\n\n多家媒体称，Garlic 在 OpenAI ...",
+    "link": "https://x.com/op7418/status/1996426762860073274",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 03:50:06 GMT",
+    "cached_time": 1765181720.1449597
+  },
+  "c4b1761c9264ae855f1e4ccf66abacac": {
+    "title": "详细信息：https://t.co/jS68ubb4ak",
+    "link": "https://x.com/op7418/status/1996414197127905374",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 03:00:10 GMT",
+    "cached_time": 1765181735.9677472
+  },
+  "32aaa49088a6406af929c188ef3f8185": {
+    "title": "谷歌发布了 Google Workspace Studio Agent 构建工具\n\n支持无代码构建Agent，提供了大量模板。\n\n支持跨应用编排，数据可以在谷歌应用和其他第三方应用之间流转。\n\n主要是...",
+    "link": "https://x.com/op7418/status/1996413645644046639",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 02:57:59 GMT",
+    "cached_time": 1765181742.2974546
+  },
+  "417d3bb03b653b257225536f7fd3a16f": {
+    "title": "不是这 steadydancer 也太真了，咋该动的地方都在动啊",
+    "link": "https://x.com/op7418/status/1996411450169143379",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 02:49:15 GMT",
+    "cached_time": 1765181749.4622731
+  },
+  "3cdf06930624ba095cf8350f3be71b78": {
+    "title": "明年真是个大年，主要的几个头部的AI公司都准备IPO。\n\n之前OpenAI说要准备IPO，国内的智谱和Minimax也在做准备。\n\n现在 Anthropic 也跟进了，目前正在跟与投行的沟通。\n\n同时...",
+    "link": "https://x.com/op7418/status/1996407604558655964",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Thu, 04 Dec 2025 02:33:59 GMT",
+    "cached_time": 1765181756.4376092
+  },
+  "e2f0b98ebe06a407615ff0cf417f10e1": {
+    "title": "豆包里叫4.5，即梦里可能还有个4.1，也不知道这俩模型是不是一个。",
+    "link": "https://x.com/op7418/status/1996241690085195917",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Wed, 03 Dec 2025 15:34:41 GMT",
+    "cached_time": 1765181762.0931673
+  },
+  "32e1edaeb3b2b995cefd9150cc2b5fbd": {
+    "title": "字节也发布了 Seedream 4.5 图像模型\n\n主要提升了多图场景下的表现，比如融合度和一致性\n\n美学表现指令遵循也有一定的提高",
+    "link": "https://x.com/op7418/status/1996240611414827298",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Wed, 03 Dec 2025 15:30:24 GMT",
+    "cached_time": 1765181767.497215
+  },
+  "18c2e88bf25661634047bef8c15e8e50": {
+    "title": "可灵发布 2.6 视频模型，支持音画同出\n\n在声音层面的能力基本拉齐 Veo 3，无论是正常的对话、唇形同步还是唱歌、Rap 以及最基本的环境音都可以搞定",
+    "link": "https://x.com/op7418/status/1996238347329814934",
+    "author": "歸藏(guizang.ai) (@op7418)",
+    "published": "Wed, 03 Dec 2025 15:21:24 GMT",
+    "cached_time": 1765181774.8270957
+  },
+  "5fdea06034524d380aaadd2630fb1088": {
+    "title": "训练好一个机器学习模型往往只是第一步，最头疼的其实是向老板或业务方解释：为什么模型给出了这个预测结果？面对“黑盒”模型，常常哑口无言。最近在 GitHub 挖...",
+    "link": "https://weibo.com/5722964389/QhshJeIx3",
+    "author": "GitHubDaily",
+    "published": "Mon, 08 Dec 2025 07:30:20 GMT",
+    "cached_time": 1765181801.6779404
   }
 }
