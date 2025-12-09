@@ -175,7 +175,7 @@ class NotionManager:
                     "rich_text": {}
                 },
                 "AI分类": {
-                    "select": {
+                    "multi_select": {
                         "options": [
                             {"name": "科技资讯", "color": "blue"},
                             {"name": "人工智能", "color": "purple"},
@@ -397,10 +397,26 @@ class NotionManager:
                         }
                     ]
                 }
+                # 支持 Notion 多选分类属性
+                category_value = (
+                    ai_analysis.get("categories")
+                    or ai_analysis.get("tags")
+                    or ai_analysis.get("category")
+                )
+                if isinstance(category_value, str):
+                    category_list = [category_value]
+                elif isinstance(category_value, list):
+                    category_list = [str(item) for item in category_value if item]
+                else:
+                    category_list = []
+
+                if not category_list:
+                    category_list = [ai_analysis.get("category", "其他")]
+
                 properties["AI分类"] = {
-                    "select": {
-                        "name": ai_analysis.get('category', '其他')
-                    }
+                    "multi_select": [
+                        {"name": name} for name in category_list[:5]  # 适度限制数量
+                    ]
                 }
 
             return self._create_page_with_content(properties, summary, image_urls, image_uploader, title, platform, url, quoted_tweets)
