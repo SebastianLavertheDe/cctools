@@ -7,7 +7,7 @@ import re
 import requests
 import mimetypes
 from typing import Optional, List, Dict, Any
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, quote_plus, unquote_plus
 
 
 class NotionImageUploader:
@@ -115,30 +115,43 @@ class NotionImageUploader:
             return None
     
     def convert_twitter_image_url(self, url: str) -> str:
-        """将Twitter图片URL转换为代理URL，避免Notion访问被拒绝"""
+        """将Twitter图片URL转换为 duckduckgo 代理，先去掉已有代理"""
         try:
             # 解码HTML实体
             import html
-            from urllib.parse import quote_plus
             
             decoded_url = html.unescape(url).strip()
+
+            def strip_proxy(u: str) -> str:
+                parsed = urlparse(u)
+                host = parsed.netloc.lower()
+                qs = parse_qs(parsed.query)
+
+                # 还原 duckduckgo 代理
+                if "proxy.duckduckgo.com" in host:
+                    original = qs.get("u", [u])[0]
+                else:
+                    original = u
+
+                original = unquote_plus(original)
+                if original and not original.startswith("http"):
+                    original = f"https://{original.lstrip('/')}"
+                return original
+
+            original_url = strip_proxy(decoded_url)
             
             # 检查是否是Twitter图片
-            if 'pbs.twimg.com' in decoded_url or 'twimg.com' in decoded_url:
-                # 移除https://前缀，因为代理服务不需要
-                clean_url = decoded_url.replace('https://', '').replace('http://', '')
+            if 'pbs.twimg.com' in original_url or 'twimg.com' in original_url:
+                proxy_url = f'https://proxy.duckduckgo.com/iu/?u={quote_plus(original_url)}'
                 
-                # 使用images.weserv.nl代理服务
-                proxy_url = f'https://images.weserv.nl/?url={quote_plus(clean_url)}'
-                
-                print(f"🔄 Twitter图片代理转换:")
-                print(f"   原始URL: {decoded_url}")
+                print("🔄 Twitter图片代理转换 (duckduckgo):")
+                print(f"   原始URL: {original_url}")
                 print(f"   代理URL: {proxy_url}")
                 
                 return proxy_url
             
             # 非Twitter图片直接返回
-            return decoded_url
+            return original_url
             
         except Exception as e:
             print(f"⚠️ 图片URL转换失败: {e}")
