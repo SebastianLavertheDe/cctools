@@ -1,0 +1,32 @@
+# RSS to Notion Configuration
+
+# OPML file containing RSS feed subscriptions
+opml_file: "subscriptions.opml"
+
+# Processing settings
+max_articles_per_feed: 1  # Maximum articles to process per RSS feed
+
+# Content extraction settings
+content:
+  extractor: "trafilatura"
+  include_images: true
+  max_content_length: 50000
+
+# AI processing settings
+ai:
+  enabled: true
+  summarize_full_content: true
+  categories:
+    - System Design
+    - Distributed Systems
+    - Database
+    - Network
+    - Architecture
+    - Algorithms
+    - Backend
+    - Frontend
+    - DevOps
+    - Machine Learning
+    - AI
+    - Golang
+    - Other

@@ -2,3 +2,19 @@ video/
 .env
 .venv/
 **/.venv/
+CLAUDE.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+**/__pycache__/
+
+# Skills
+article_cache.json
+uv.lock
+.claude/settings.local.json
+
+# Generated articles
+article/
+**/articles/

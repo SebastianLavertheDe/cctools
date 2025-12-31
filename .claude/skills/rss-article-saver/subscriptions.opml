@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<opml version="2.0">
+    <head>
+        <title>RSS Subscriptions</title>
+    </head>
+    <body>
+        <outline text="ByteByteGo Newsletter" title="ByteByteGo Newsletter" type="rss" xmlUrl="https://blog.bytebytego.com/feed"/>
+        <outline text="Last Week in AI" title="Last Week in AI" type="rss" xmlUrl="https://lastweekin.ai/feed/"/>
+    </body>
+</opml>
