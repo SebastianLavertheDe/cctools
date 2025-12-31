@@ -15,6 +15,7 @@ content:
 # AI processing settings
 ai:
   enabled: true
+  provider: deepseek  # Options: deepseek, gemini
   summarize_full_content: true
   categories:
     - System Design
@@ -30,3 +31,7 @@ ai:
     - AI
     - Golang
     - Other
+
+# Notion sync settings
+notion:
+  sync: true  # Set to true to enable Notion sync

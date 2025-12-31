@@ -4,7 +4,6 @@
         <title>RSS Subscriptions</title>
     </head>
     <body>
-        <outline text="ByteByteGo Newsletter" title="ByteByteGo Newsletter" type="rss" xmlUrl="https://blog.bytebytego.com/feed"/>
-        <outline text="Last Week in AI" title="Last Week in AI" type="rss" xmlUrl="https://lastweekin.ai/feed/"/>
+        <outline text="Anthropic Engineering" title="Anthropic Engineering" type="rss" xmlUrl="https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_engineering.xml"/>
     </body>
 </opml>

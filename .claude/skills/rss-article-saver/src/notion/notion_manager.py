@@ -3,6 +3,9 @@ Notion Manager - Blog articles sync to existing database
 """
 
 import os
+import requests
+import mimetypes
+import tempfile
 from notion_client import Client
 from typing import Optional
 
@@ -45,10 +48,7 @@ class BlogNotionManager:
             return False
 
         try:
-            from ..utils.text_utils import parse_published_time, build_paragraph_blocks
-
             # Build page properties - mapped to Reading List database schema
-            # Use translated title if available, otherwise use original title
             title_to_use = article.translated_title if article.translated_title else article.title
             properties = {
                 "Title": {
@@ -66,7 +66,6 @@ class BlogNotionManager:
 
             # Add AI summary if available (only first sentence)
             if article.ai_summary:
-                # Extract first sentence
                 first_sentence = article.ai_summary.split('。')[0].split('！')[0].split('？')[0].split('. ')[0].split('!')[0].split('?')[0].strip()
                 if not first_sentence:
                     first_sentence = article.ai_summary[:200]
@@ -86,7 +85,7 @@ class BlogNotionManager:
                     "number": article.ai_score
                 }
 
-            # Set Status to "Not Started" (common status in Reading List)
+            # Set Status to "Not Started"
             properties["Status"] = {
                 "status": {"name": "Not Started"}
             }
@@ -94,13 +93,14 @@ class BlogNotionManager:
             # Create page with content
             children = self._build_page_content(article)
 
-            # Add cover image (first image)
+            # Build page data
             page_data = {
                 "parent": {"database_id": self.database_id},
                 "properties": properties,
                 "children": children
             }
 
+            # Add cover image (first image) - use external URL for cover
             if article.image_urls:
                 page_data["cover"] = {
                     "type": "external",
@@ -114,7 +114,6 @@ class BlogNotionManager:
 
         except Exception as e:
             print(f"  Notion sync failed: {e}")
-            # Try to provide helpful error message
             if "object not found" in str(e).lower():
                 print("  Hint: Check NOTION_DATABASE_ID and database permissions")
             elif "property" in str(e).lower():
@@ -122,28 +121,113 @@ class BlogNotionManager:
             return False
 
     def _build_page_content(self, article: 'Article') -> list:
-        """Build Notion page content blocks from Markdown"""
+        """Build Notion page content blocks - AI summary + uploaded images only"""
         children = []
 
-        # Use AI analysis if available, otherwise use full content
-        content_to_use = article.ai_summary if article.ai_summary else article.full_content
-
-        if content_to_use:
-            md_blocks = self._markdown_to_blocks(content_to_use)
+        # Add AI analysis summary
+        if article.ai_summary:
+            md_blocks = self._markdown_to_blocks(article.ai_summary)
             children.extend(md_blocks)
 
-        # Add images (all content images)
+        # Upload and add images from the original article
         if article.image_urls:
-            for img_url in article.image_urls:
+            # Add a divider before images
+            children.append({"type": "divider", "divider": {}})
+            # Add section header
+            children.append({
+                "type": "heading_2",
+                "heading_2": {
+                    "rich_text": [{"type": "text", "text": {"content": "文章图片"}}]
+                }
+            })
+            # Add images using external URLs (limit to 10 for performance)
+            for img_url in article.image_urls[:10]:
+                # Parse real URL from proxy URLs
+                real_url = self._parse_image_url(img_url)
                 children.append({
                     "type": "image",
                     "image": {
                         "type": "external",
-                        "external": {"url": img_url}
+                        "external": {"url": real_url}
                     }
                 })
 
+        # Notion API limit: max 100 children per page
+        if len(children) > 100:
+            children = children[:100]
+            print(f"    Content truncated to 100 blocks (Notion API limit)")
+
         return children
+
+    def _upload_image_to_notion(self, image_url: str) -> Optional[str]:
+        """Upload image to Notion and return file URL"""
+        try:
+            # Parse real image URL from Next.js proxy URLs
+            real_url = self._parse_image_url(image_url)
+
+            # 1. Download image to temp file
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+                response = requests.get(real_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+                response.raise_for_status()
+                tmp.write(response.content)
+                tmp_path = tmp.name
+
+            # 2. Create upload object
+            notion_key = os.getenv("notion_key")
+            resp = requests.post(
+                "https://api.notion.com/v1/file_uploads",
+                headers={
+                    "Authorization": f"Bearer {notion_key}",
+                    "Notion-Version": "2022-06-28",
+                    "Content-Type": "application/json"
+                },
+                json={}
+            )
+            resp.raise_for_status()
+            upload_obj = resp.json()
+            upload_id = upload_obj["id"]
+
+            # 3. Send file content
+            mime = mimetypes.guess_type(tmp_path)[0] or "image/jpeg"
+            with open(tmp_path, "rb") as f:
+                resp = requests.post(
+                    f"https://api.notion.com/v1/file_uploads/{upload_id}/send",
+                    headers={
+                        "Authorization": f"Bearer {notion_key}",
+                        "Notion-Version": "2022-06-28"
+                    },
+                    files={"file": (os.path.basename(tmp_path), f, mime)}
+                )
+            resp.raise_for_status()
+            result = resp.json()
+
+            # 4. Clean up temp file
+            os.remove(tmp_path)
+
+            # Return the upload_id for Notion to use
+            # Notion will use this to reference the uploaded file
+            return upload_id
+
+        except Exception as e:
+            print(f"    Image upload failed: {e}")
+            return None
+
+    def _parse_image_url(self, url: str) -> str:
+        """Parse real image URL from Next.js proxy URLs"""
+        try:
+            from urllib.parse import urlparse, parse_qs, unquote_plus
+
+            # Check if it's a Next.js image proxy URL
+            if "/_next/image" in url:
+                parsed = urlparse(url)
+                query = parse_qs(parsed.query)
+                # Get the real URL from the 'url' parameter
+                real_url = query.get("url", [url])[0]
+                return unquote_plus(real_url)
+
+            return url
+        except:
+            return url
 
     def _markdown_to_blocks(self, md_text: str) -> list:
         """Convert Markdown text to Notion blocks"""
@@ -217,101 +301,43 @@ class BlogNotionManager:
                 })
                 i += 1
 
-            # Regular paragraph - might span multiple lines
+            # Regular paragraph
             else:
-                paragraph_lines = [line]
-                i += 1
-                # Collect consecutive non-empty lines that aren't special
-                while i < len(lines):
-                    next_line = lines[i].rstrip()
-                    if not next_line:
-                        break
-                    if (next_line.startswith(('#', '- ', '* ')) or
-                        re.match(r'^\d+\.\s', next_line) or
-                        next_line.strip() == '---'):
-                        break
-                    paragraph_lines.append(next_line)
-                    i += 1
-
-                paragraph_text = '\n'.join(paragraph_lines)
                 blocks.append({
                     "type": "paragraph",
                     "paragraph": {
-                        "rich_text": self._parse_inline_formatting(paragraph_text)
+                        "rich_text": self._parse_inline_formatting(line)
                     }
                 })
+                i += 1
 
         return blocks
 
     def _parse_inline_formatting(self, text: str) -> list:
-        """Parse inline Markdown formatting (bold, italic) to Notion rich text array"""
-        # First, parse all bold/regular segments from the entire text
-        def parse_segments(t: str) -> list:
-            """Recursively parse text into (type, content) tuples"""
-            if not t:
-                return []
-
-            # Check for bold at the start
-            if t.startswith('**'):
-                end = t.find('**', 2)
-                if end != -1:
-                    bold_content = t[2:end]
-                    # Recursively parse the rest
-                    return [("bold", bold_content)] + parse_segments(t[end+2:])
-                else:
-                    # Unmatched **, treat as regular text
-                    return [("text", t)]
-
-            # Find next ** marker
-            next_bold = t.find('**')
-            if next_bold == -1:
-                return [("text", t)]
-
-            # Text before the next **
-            if next_bold > 0:
-                return [("text", t[:next_bold])] + parse_segments(t[next_bold:])
-            else:
-                return parse_segments(t[2:])
-
-        # Parse all segments
-        segments = parse_segments(text)
-
-        # Now chunk each segment if needed
+        """Parse inline Markdown formatting (bold) to Notion rich text array"""
         parts = []
-        for ptype, pcontent in segments:
-            if len(pcontent) <= 1999:
-                # No chunking needed
-                if ptype == "bold":
+        remaining = text
+
+        while remaining:
+            # Find bold markers
+            if remaining.startswith('**'):
+                end = remaining.find('**', 2)
+                if end != -1:
+                    bold_content = remaining[2:end]
                     parts.append({
                         "type": "text",
-                        "text": {"content": pcontent},
+                        "text": {"content": bold_content[:1999]},
                         "annotations": {"bold": True}
                     })
-                else:
-                    parts.append({
-                        "type": "text",
-                        "text": {"content": pcontent}
-                    })
-            else:
-                # Chunk this segment - use 1900 to be safe
-                for j in range(0, len(pcontent), 1900):
-                    chunk = pcontent[j:j+1900]
-                    if ptype == "bold":
-                        parts.append({
-                            "type": "text",
-                            "text": {"content": chunk},
-                            "annotations": {"bold": True}
-                        })
-                    else:
-                        parts.append({
-                            "type": "text",
-                            "text": {"content": chunk}
-                        })
+                    remaining = remaining[end+2:]
+                    continue
 
-        # Debug: check for oversized parts
-        for i, part in enumerate(parts):
-            content_len = len(part.get("text", {}).get("content", ""))
-            if content_len > 1999:
-                print(f"  WARNING: Part {i} has {content_len} chars (exceeds 1999)!")
+            # No more bold, add rest as plain text
+            if remaining:
+                parts.append({
+                    "type": "text",
+                    "text": {"content": remaining[:1999]}
+                })
+                break
 
-        return parts if parts else [{"type": "text", "text": {"content": text[:1900]}}]
+        return parts if parts else [{"type": "text", "text": {"content": text[:1999]}}]

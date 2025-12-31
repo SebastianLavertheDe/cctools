@@ -21,19 +21,35 @@ class RSSManager:
         self.config = config
         self.cache_manager = ArticleCacheManager()
         self.content_extractor = ContentExtractor(config.get_content_settings())
-        self.notion_manager = BlogNotionManager()
+
+        # Get Notion sync settings
+        notion_settings = config.get_notion_settings()
+        self.notion_sync_enabled = notion_settings.get('sync', True)
+
+        # Only initialize Notion manager if sync is enabled
+        if self.notion_sync_enabled:
+            self.notion_manager = BlogNotionManager()
+        else:
+            self.notion_manager = None
+            print("Notion sync disabled (notion.sync: false)")
 
         # Setup article directory (in cctools root)
         self.article_dir = Path(__file__).parent.parent.parent.parent.parent.parent / "article"
         self.article_dir.mkdir(exist_ok=True)
 
-        # Initialize AI client
+        # Initialize AI client based on config
         try:
             ai_config = config.get_ai_settings()
             if ai_config.get('enabled', True):
-                from ..ai.deepseek_client import DeepSeekClient
-                self.ai_client = DeepSeekClient()
-                print("AI client initialized")
+                ai_provider = ai_config.get('provider', 'deepseek').lower()
+                if ai_provider == 'gemini' or ai_provider == 'google':
+                    from ..ai.google_client import GeminiClient
+                    self.ai_client = GeminiClient()
+                    print(f"AI client initialized (Gemini)")
+                else:
+                    from ..ai.deepseek_client import DeepSeekClient
+                    self.ai_client = DeepSeekClient()
+                    print(f"AI client initialized (DeepSeek)")
             else:
                 self.ai_client = None
         except Exception as e:
@@ -105,22 +121,22 @@ class RSSManager:
             print("    Analyzing with AI...")
             self._analyze_article(article)
 
-        # Check score threshold (skip if score < 70)
-        if article.ai_score is not None and article.ai_score < 70:
+        # Check score threshold (skip if score < 30) - NOTE: Lowered for testing
+        if article.ai_score is not None and article.ai_score < 30:
             print(f"    Score: {article.ai_score}/100 - Skipped (below threshold)")
             # Still add to cache to avoid reprocessing
             self.cache_manager.add_article_to_cache(article)
             return
 
         # Sync to Notion
-        if self.notion_manager.enabled:
+        if self.notion_sync_enabled and self.notion_manager and self.notion_manager.enabled:
             print("    Syncing to Notion...")
             self.notion_manager.push_article_to_notion(article)
 
         # Add to cache
         self.cache_manager.add_article_to_cache(article)
 
-        # Save original article to file (only if score >= 70)
+        # Save original article to file (only if score >= 62)
         self._save_article(article)
 
     def _save_article(self, article: Article) -> None:

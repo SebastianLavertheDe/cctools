@@ -1,13 +1,13 @@
 """
-DeepSeek AI 客户端
-负责与DeepSeek API进行交互，实现文本总结和分类功能
+Google Gemini AI 客户端
+负责与 Google Gemini API 进行交互，实现文本总结和分类功能
 """
 
 import os
 import json
 import time
 from typing import Dict, List, Optional, Tuple
-from openai import OpenAI
+import google.generativeai as genai
 import re
 
 
@@ -53,48 +53,60 @@ def extract_json_from_response(response: str) -> str:
     return text.strip()
 
 
-class DeepSeekClient:
-    """DeepSeek AI 客户端"""
+class GeminiClient:
+    """Google Gemini AI 客户端"""
 
     def __init__(self):
-        self.api_key = os.getenv('DEEPSEEK_API_KEY')
-        # Use DEEPSEEK_MODEL if set, otherwise always use deepseek-chat
-        self.model = os.getenv('DEEPSEEK_MODEL', 'deepseek-chat')
+        self.api_key = os.getenv('GEMINI_API_KEY')
+        self.model_name = os.getenv('AI_MODEL', 'gemini-2.0-flash')
 
         if not self.api_key or not self.api_key.strip():
-            raise ValueError("DEEPSEEK_API_KEY 未设置或为空")
+            raise ValueError("GEMINI_API_KEY 未设置或为空")
 
-        # 初始化OpenAI客户端，指向DeepSeek API
-        self.client = OpenAI(
-            api_key=self.api_key,
-            base_url="https://api.deepseek.com"
-        )
+        # 初始化 Gemini
+        genai.configure(api_key=self.api_key)
+        self.model = genai.GenerativeModel(self.model_name)
 
-    def _make_request(self, messages: List[Dict], max_tokens: int = 1000) -> Optional[str]:
+    def _make_request(self, prompt: str, max_tokens: int = 1000, max_retries: int = 3) -> Optional[str]:
         """
-        发起API请求
+        发起API请求，带重试逻辑
 
         Args:
-            messages: 对话消息列表
+            prompt: 完整的提示词
             max_tokens: 最大token数
+            max_retries: 最大重试次数
 
         Returns:
             API响应内容，失败时返回None
         """
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                max_tokens=max_tokens,
-                temperature=0.3,
-                stream=False
-            )
+        import time as time_module
+        
+        for attempt in range(max_retries):
+            try:
+                response = self.model.generate_content(
+                    prompt,
+                    generation_config=genai.types.GenerationConfig(
+                        max_output_tokens=max_tokens,
+                        temperature=0.3,
+                    )
+                )
 
-            return response.choices[0].message.content.strip()
+                return response.text.strip()
 
-        except Exception as e:
-            print(f"DeepSeek API 请求失败: {e}")
-            return None
+            except Exception as e:
+                error_str = str(e)
+                # Check if it's a rate limit error (429)
+                if '429' in error_str or 'quota' in error_str.lower():
+                    wait_time = (attempt + 1) * 30  # 30s, 60s, 90s
+                    print(f"  Rate limit hit, waiting {wait_time}s before retry ({attempt + 1}/{max_retries})...")
+                    time_module.sleep(wait_time)
+                    continue
+                else:
+                    print(f"Gemini API 请求失败: {e}")
+                    return None
+        
+        print(f"Gemini API 请求失败: 重试 {max_retries} 次后仍然失败")
+        return None
 
     def summarize_text(self, text: str, max_length: int = 200) -> Optional[str]:
         """
@@ -145,7 +157,7 @@ class DeepSeekClient:
 
 ---
 
-# summary 字段要求（中文Markdown 字符串，适合 Notion）
+# summary 字段要求（Markdown 字符串，适合 Notion）
 
 `summary` 的值是一个 **Markdown 格式字符串**，按下面结构输出（标题与小标题固定）：
 
@@ -204,21 +216,13 @@ class DeepSeekClient:
 * 必须返回形如：`{"summary":"...markdown...","score":82}`
 * `summary` 内部换行必须用 `\n` 表示，确保 JSON 合法。
 * `summary` 中如出现双引号 `"`，必须用 `\"` 转义。
-"""
 
-        messages = [
-            {
-                "role": "system",
-                "content": analysis_prompt
-            },
-            {
-                "role": "user",
-                "content": f"请分析以下文章：\n\n{text}"
-            }
-        ]
+请分析以下文章：
+
+""" + text
 
         # Increase max_tokens for detailed analysis
-        return self._make_request(messages, max_tokens=4000)
+        return self._make_request(analysis_prompt, max_tokens=4000)
 
     def classify_text(self, text: str) -> Optional[Tuple[str, float]]:
         """
@@ -236,10 +240,7 @@ class DeepSeekClient:
             "DevOps", "Machine Learning", "AI", "Golang", "Other"
         ]
 
-        messages = [
-            {
-                "role": "system",
-                "content": f"""你是一个专业的文本分类专家。请对用户提供的文本进行分类。
+        prompt = f"""你是一个专业的文本分类专家。请对用户提供的文本进行分类。
 
 可选分类：{', '.join(categories)}
 
@@ -247,20 +248,21 @@ class DeepSeekClient:
 1. 从上述分类中选择最合适的一个
 2. 返回JSON格式：{{"category": "分类名称", "confidence": 置信度(0-1的小数)}}
 3. 置信度表示分类的确信程度
-4. 如果不确定，选择"Other"类别"""
-            },
-            {
-                "role": "user",
-                "content": f"请对以下内容进行分类：\n\n{text}"
-            }
-        ]
+4. 如果不确定，选择"Other"类别
 
-        result = self._make_request(messages, max_tokens=100)
+请对以下内容进行分类：
+
+{text}"""
+
+        result = self._make_request(prompt, max_tokens=100)
         if not result:
             return None
 
         try:
-            parsed = json.loads(result)
+            # Use helper function to extract JSON from markdown code blocks
+            response_to_parse = extract_json_from_response(result)
+
+            parsed = json.loads(response_to_parse)
             category = parsed.get('category', 'Other')
             confidence = float(parsed.get('confidence', 0.5))
 
@@ -306,8 +308,13 @@ class DeepSeekClient:
                 summary_text = parsed.get('summary', '')
                 score = parsed.get('score')
             except json.JSONDecodeError as e:
+                # Print diagnostic info for debugging
+                print(f"  JSON解析失败: {e}")
+                print(f"  响应前100字符: {response_to_parse[:100] if response_to_parse else 'None'}...")
                 # Fallback: treat as plain text
                 summary_text = ai_response
+        else:
+            print(f"  AI未返回响应")
 
         # Extract title from summary (first line should be "# [title]")
         if summary_text:

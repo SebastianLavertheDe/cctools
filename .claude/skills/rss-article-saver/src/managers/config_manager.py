@@ -44,3 +44,7 @@ class RSSConfig:
     def get_ai_settings(self) -> Dict:
         """Get AI processing settings"""
         return self.config.get('ai', {})
+
+    def get_notion_settings(self) -> Dict:
+        """Get Notion sync settings"""
+        return self.config.get('notion', {'sync': True})

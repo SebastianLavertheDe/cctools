@@ -5,9 +5,38 @@ Content Manager - Full content extraction using trafilatura
 import trafilatura
 import requests
 import re
+import os
 from typing import Optional, Dict, List
 from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
+
+
+class FirecrawlExtractor:
+    """Fallback extractor using Firecrawl for JavaScript-rendered pages"""
+
+    def __init__(self):
+        self.api_key = os.getenv('FIRECRAWL_API_KEY')
+        self.enabled = bool(self.api_key)
+
+    def scrape(self, url: str) -> Optional[str]:
+        """Scrape URL using Firecrawl"""
+        if not self.enabled:
+            return None
+        try:
+            from firecrawl import FirecrawlApp
+
+            app = FirecrawlApp(api_key=self.api_key)
+            result = app.scrape_url(url, params={'formats': ['markdown']})
+
+            if result and 'markdown' in result:
+                return result['markdown']
+            return None
+        except ImportError:
+            print("  Firecrawl not installed, skipping")
+            return None
+        except Exception as e:
+            print(f"  Firecrawl extraction failed: {e}")
+            return None
 
 
 class ContentExtractor:
@@ -17,6 +46,7 @@ class ContentExtractor:
         self.extractor = config.get('extractor', 'trafilatura')
         self.include_images = config.get('include_images', True)
         self.max_length = config.get('max_content_length', 50000)
+        self.firecrawl = FirecrawlExtractor()
 
     def extract_content(self, url: str) -> Dict:
         """
@@ -49,6 +79,19 @@ class ContentExtractor:
             # Use BeautifulSoup to extract content with embedded images
             content = self._extract_content_with_images(downloaded, image_list)
 
+            # If content is too short, it might be JavaScript-rendered
+            # Try Firecrawl as fallback
+            if not content or len(content) < 200:
+                print(f"    Content too short ({len(content) if content else 0} chars), trying Firecrawl...")
+                markdown_content = self.firecrawl.scrape(url)
+                if markdown_content:
+                    content = markdown_content
+                    print(f"    Firecrawl extraction got {len(content)} chars")
+                    # Extract images from markdown
+                    if self.include_images:
+                        image_list = self._extract_images_from_markdown(markdown_content)
+                    result['images'] = image_list
+
             if content:
                 # Truncate if too long
                 if len(content) > self.max_length:
@@ -67,6 +110,27 @@ class ContentExtractor:
             print(f"  Content extraction failed: {e}")
 
         return result
+
+    def _extract_images_from_markdown(self, markdown: str) -> List[str]:
+        """Extract image URLs from markdown content"""
+        try:
+            # Match markdown image syntax: ![alt](url)
+            img_pattern = r'!\[.*?\]\(([^)]+)\)'
+            images = re.findall(img_pattern, markdown)
+
+            # Deduplicate and filter
+            unique_images = []
+            seen = set()
+            for img in images:
+                if img not in seen:
+                    seen.add(img)
+                    if img.startswith('http'):
+                        unique_images.append(img)
+
+            return unique_images
+        except Exception as e:
+            print(f"  Markdown image extraction failed: {e}")
+            return []
 
     def _extract_images(self, html: str, base_url: str) -> List[str]:
         """Extract image URLs from HTML using regex"""
