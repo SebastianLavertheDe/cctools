@@ -100,11 +100,13 @@ class BlogNotionManager:
                 "children": children
             }
 
-            # Add cover image (first image) - use external URL for cover
+            # Add cover image (first image) - use parsed real URL
             if article.image_urls:
+                # Parse real URL from Next.js proxy URLs
+                cover_url = self._parse_image_url(article.image_urls[0])
                 page_data["cover"] = {
                     "type": "external",
-                    "external": {"url": article.image_urls[0]}
+                    "external": {"url": cover_url}
                 }
 
             self.client.pages.create(**page_data)

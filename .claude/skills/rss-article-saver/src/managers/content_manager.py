@@ -195,14 +195,74 @@ class ContentExtractor:
 
             # Build text with embedded images
             content_parts = []
-            image_set = set(image_list)
+
+            # Extract base URL from image_list (all from same domain)
+            base = ""
+            if image_list:
+                # Use the first image to determine base URL
+                first_img = image_list[0]
+                if first_img.startswith('http'):
+                    parsed = urlparse(first_img)
+                    base = f"{parsed.scheme}://{parsed.netloc}"
+                elif first_img.startswith('/'):
+                    # Relative path, need to get from HTML context
+                    # Try to find base tag or use common domain
+                    base_tag = soup.find('base')
+                    if base_tag and base_tag.get('href'):
+                        base = base_tag['href']
+                    else:
+                        base = "https://www.anthropic.com"
+
+            # Build filename mapping for faster matching
+            filename_to_idx = {}
+            for i, img_url in enumerate(image_list):
+                parsed = urlparse(img_url)
+                # Extract filename from URL
+                filename = parsed.path.split('/')[-1]
+                # Also try with query parameter (Next.js URLs)
+                if 'url=' in img_url:
+                    from urllib.parse import unquote
+                    # Extract the real URL from Next.js proxy
+                    match = re.search(r'url=([^&]+)', img_url)
+                    if match:
+                        real_url = unquote(match.group(1))
+                        real_parsed = urlparse(real_url)
+                        filename = real_parsed.path.split('/')[-1]
+                if filename:
+                    filename_to_idx[filename] = i + 1
 
             for elem in main_content.descendants:
                 if elem.name == 'img':
                     src = elem.get('src', '')
-                    if src in image_set:
-                        idx = image_list.index(src)
-                        content_parts.append(f'\n\n![图片{idx+1}]({src})\n\n')
+                    if not src:
+                        continue
+                    # Convert to absolute for matching
+                    if src.startswith('http'):
+                        abs_src = src
+                    elif src.startswith('//'):
+                        abs_src = f"https:{src}"
+                    else:
+                        abs_src = urljoin(base, src)
+
+                    # Extract filename and find matching index
+                    parsed_src = urlparse(abs_src)
+                    src_filename = parsed_src.path.split('/')[-1]
+
+                    # Also check for Next.js proxy URLs
+                    if 'url=' in abs_src:
+                        from urllib.parse import unquote, parse_qs
+                        qs = parse_qs(parsed_src.query)
+                        if 'url' in qs:
+                            real_url = unquote(qs['url'][0])
+                            real_parsed = urlparse(real_url)
+                            src_filename = real_parsed.path.split('/')[-1]
+                            # Use the real URL for display
+                            abs_src = real_url
+
+                    # Find matching index by filename
+                    idx = filename_to_idx.get(src_filename, len(filename_to_idx) + 1)
+
+                    content_parts.append(f'\n\n![图片{idx}]({abs_src})\n\n')
                 elif elem.name in ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'pre', 'code']:
                     text = elem.get_text(strip=True)
                     if text:

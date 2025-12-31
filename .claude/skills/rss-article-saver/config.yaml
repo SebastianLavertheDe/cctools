@@ -15,7 +15,7 @@ content:
 # AI processing settings
 ai:
   enabled: true
-  provider: deepseek  # Options: deepseek, gemini
+  provider: deepseek  # Options: deepseek, gemini, google, zhipu, glm
   summarize_full_content: true
   categories:
     - System Design

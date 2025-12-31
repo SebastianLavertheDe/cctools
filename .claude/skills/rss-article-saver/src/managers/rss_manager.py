@@ -46,6 +46,10 @@ class RSSManager:
                     from ..ai.google_client import GeminiClient
                     self.ai_client = GeminiClient()
                     print(f"AI client initialized (Gemini)")
+                elif ai_provider == 'zhipu' or ai_provider == 'glm':
+                    from ..ai.zhipu_client import ZhipuClient
+                    self.ai_client = ZhipuClient()
+                    print(f"AI client initialized (Zhipu AI)")
                 else:
                     from ..ai.deepseek_client import DeepSeekClient
                     self.ai_client = DeepSeekClient()
@@ -142,12 +146,16 @@ class RSSManager:
     def _save_article(self, article: Article) -> None:
         """Save article to articles directory as Markdown"""
         try:
-            # Create safe filename from title
-            safe_title = article.title[:100]
-            safe_title = safe_title.replace('/', '-').replace('\\', '-')
+            # Use AI translated title for filename, fallback to original
+            title_for_filename = article.translated_title if article.translated_title else article.title
+            title_for_filename = title_for_filename[:100]
+
+            # Create safe filename (keep Chinese characters)
+            safe_title = title_for_filename.replace('/', '-').replace('\\', '-')
             safe_title = safe_title.replace(':', '').replace('?', '').replace('*', '')
             safe_title = safe_title.replace('"', '').replace('<', '').replace('>', '').replace('|', '')
-            safe_title = ''.join(c if c.isalnum() or c in (' ', '-', '_') else '_' for c in safe_title)
+            # Only replace special characters, keep alphanumeric and Chinese
+            safe_title = ''.join(c if c.isalnum() or c > '\u4e00' and c < '\u9fff' or c in (' ', '-', '_') else '_' for c in safe_title)
 
             # Create filename with timestamp
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -175,6 +183,13 @@ class RSSManager:
             if article.ai_summary:
                 md_content.append("## AI 分析\n")
                 md_content.append(f"{article.ai_summary}\n")
+
+            # Images list (if available)
+            if article.image_urls:
+                md_content.append("## 文章图片\n")
+                for idx, img_url in enumerate(article.image_urls, 1):
+                    md_content.append(f"![图片{idx}]({img_url})\n")
+                md_content.append("")
 
             # Original Content (images are embedded in content now)
             md_content.append("## 正文\n")
