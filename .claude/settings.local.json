@@ -30,7 +30,9 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: add novel-writer skill and complete novel \"雪夜密室\"\n\n- Added novel-writer skill for structured short novel creation\n- Created complete 18-chapter mystery novel \"雪夜密室\" \\(Snow Night Locked Room\\)\n- Novel features: forensic detective, magician assistant, and medical conspiracy\n- Themes: truth, justice, and the cost of revealing secrets\n- Total: ~44,000 words, following three-act structure\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Skill(rss-article-saver)",
+      "Bash(git -C /home/say/cctools log --oneline -10)"
     ],
     "deny": [],
     "ask": []

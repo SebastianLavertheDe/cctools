@@ -4,7 +4,7 @@
 opml_file: "subscriptions.opml"
 
 # Processing settings
-max_articles_per_feed: 1  # Maximum articles to process per RSS feed
+max_articles_per_feed: 999  # Maximum articles to process per RSS feed
 
 # Content extraction settings
 content:
