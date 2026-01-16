@@ -18,4 +18,14 @@ uv.lock
 # Generated articles
 article/
 **/articles/
-settings.local.json
+settings.local.json**/output/
+**/collected_articles.json
+**/*.json
+
+# Skill outputs
+**/skills/**/output/
+**/skills/**/articles/
+
+# Workflow data
+**/workflows/collected_articles.json
+**/workflows/article_cache.json

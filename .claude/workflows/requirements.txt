@@ -1,0 +1,18 @@
+# Tech Article Collector Dependencies
+
+# Core dependencies
+httpx>=0.25.0          # Modern HTTP client for web scraping
+beautifulsoup4>=4.12.0 # HTML parsing
+pyyaml>=6.0            # Configuration management
+requests>=2.31.0       # HTTP requests
+
+# Optional dependencies
+trafilatura>=1.6.0     # Web content extraction (recommended)
+feedparser>=6.0.10     # RSS/Atom feed parsing
+openai>=1.0.0          # AI API client
+notion-client>=2.0.0   # Notion API client
+firecrawl>=1.0.0       # Advanced web scraping (optional)
+
+# For development and testing
+pytest>=7.4.0          # Testing framework
+pytest-cov>=4.1.0      # Coverage plugin
