@@ -10,7 +10,12 @@ sources:
       priority: "high"
       language: "en"
       max_articles: 10
-      
+    - name: "OpenAI News"
+      url: "https://openai.com/news/rss.xml"
+      category: "AI"
+      priority: "high"
+      language: "en"
+      max_articles: 10
     - name: "Anthropic Blog"
       url: "https://www.anthropic.com/news/rss"
       category: "AI"

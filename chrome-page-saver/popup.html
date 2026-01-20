@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sPageSaver</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 15px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0 0 5px 0;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .quick-save-btn {
+      width: 100%;
+      padding: 12px;
+      background: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .quick-save-btn:hover {
+      background: #1557b0;
+    }
+
+    .options-link {
+      display: block;
+      text-align: center;
+      padding: 10px;
+      color: #666;
+      text-decoration: none;
+      font-size: 13px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .options-link:hover {
+      background: #f5f5f5;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>sPageSaver</h1>
+  <p class="subtitle">Save web articles locally</p>
+
+  <button class="quick-save-btn" id="saveBtn">Save Current Article</button>
+
+  <a class="options-link" href="#" id="optionsLink">Settings</a>
+
+  <p class="hint">Or right-click on any page to save</p>
+
+  <script src="popup.js"></script>
+</body>
+</html>

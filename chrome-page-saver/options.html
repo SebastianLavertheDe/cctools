@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sPageSaver Settings</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .setting-group {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .setting-group h2 {
+      margin: 0 0 15px 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 3px rgba(26,115,232,0.1);
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .variables {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .variables code {
+      background: #e8eaed;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 12px;
+    }
+
+    .example {
+      background: #e8f0fe;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .example-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button.primary {
+      background: #1a73e8;
+      color: white;
+    }
+
+    button.primary:hover {
+      background: #1557b0;
+    }
+
+    button.secondary {
+      background: white;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+
+    button.secondary:hover {
+      background: #f8f9fa;
+    }
+
+    .status {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .status.success {
+      background: #e6f4ea;
+      color: #137333;
+    }
+
+    .status.error {
+      background: #fce8e6;
+      color: #c5221f;
+    }
+  </style>
+</head>
+<body>
+  <h1>sPageSaver Settings</h1>
+  <p class="subtitle">Configure how articles are saved to your Downloads folder</p>
+
+  <form id="settingsForm">
+    <div class="setting-group">
+      <h2>Save Path</h2>
+      <label for="subPath">Subfolder Structure (relative to Downloads)</label>
+      <input type="text" id="subPath" name="subPath" value="articles">
+      <div class="help-text">
+        The path where articles will be saved. Create custom folder structures.
+      </div>
+      <div class="variables">
+        <strong>Available variables:</strong><br>
+        <code>{domain}</code> - Website domain<br>
+        <code>{year}</code> - Year (e.g., 2024)<br>
+        <code>{month}</code> - Month (01-12)<br>
+        <code>{day}</code> - Day (01-31)<br>
+        <code>{date}</code> - Full date (YYYY-MM-DD)
+      </div>
+      <div class="example">
+        <div class="example-title">Example:</div>
+        articles/
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <h2>Filename Template</h2>
+      <label for="filenameTemplate">Filename Pattern</label>
+      <input type="text" id="filenameTemplate" name="filenameTemplate" value="{title}">
+      <div class="help-text">
+        The naming pattern for saved HTML files.
+      </div>
+      <div class="variables">
+        <strong>Available variables:</strong><br>
+        <code>{title}</code> - Page title<br>
+        <code>{domain}</code> - Website domain<br>
+        <code>{date}</code> - Save date (YYYY-MM-DD)<br>
+        <code>{datetime}</code> - Save datetime (ISO format)
+      </div>
+      <div class="example">
+        <div class="example-title">Example output:</div>
+        My-Article-Title.html
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button type="button" class="secondary" id="resetBtn">Reset to Default</button>
+      <button type="submit" class="primary">Save Settings</button>
+    </div>
+
+    <div class="status" id="status"></div>
+  </form>
+
+  <script src="options.js"></script>
+</body>
+</html>

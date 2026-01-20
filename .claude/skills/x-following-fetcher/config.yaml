@@ -1,0 +1,18 @@
+# X Following Fetcher Configuration
+cookie: "night_mode=2; kdt=...; auth_token=...; ct0=...; twid=..."
+
+# Authorization Bearer token (from curl -H "authorization: ...")
+authorization: "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+
+# CSRF token (from curl -H "x-csrf-token: ...")
+csrf_token: "b36766f4903f26c5e8f971299074bd893bc1df793e2f1c51d94c1a7c21b40f5cf946d086182c715ca685628da4c4df147502d1d79e39e2f751ed784cb36f2d5b090ec42d82f022a8810519ee3be78873"
+
+# Number of tweets to fetch
+count: 20
+
+# Output settings
+output:
+  # Maximum characters per tweet content
+  max_content_length: 150
+  # Include tweet metrics (likes, retweets, etc.)
+  include_metrics: true

@@ -1,5 +1,7 @@
 video/
 .env
+.env.local
+.claude/skills/*/.env
 .venv/
 **/.venv/
 CLAUDE.md

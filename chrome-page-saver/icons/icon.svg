@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a73e8"/>
+      <stop offset="100%" style="stop-color:#0d47a1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="56" fill="url(#bg)"/>
+
+  <!-- Document icon -->
+  <rect x="36" y="28" width="56" height="72" rx="4" fill="white" opacity="0.95"/>
+
+  <!-- Folded corner -->
+  <path d="M76 28 L76 44 L92 44" fill="#e0e0e0"/>
+
+  <!-- Lines representing text -->
+  <rect x="44" y="48" width="40" height="4" rx="2" fill="#1a73e8"/>
+  <rect x="44" y="56" width="40" height="4" rx="2" fill="#1a73e8" opacity="0.7"/>
+  <rect x="44" y="64" width="32" height="4" rx="2" fill="#1a73e8" opacity="0.7"/>
+  <rect x="44" y="72" width="36" height="4" rx="2" fill="#1a73e8" opacity="0.7"/>
+  <rect x="44" y="80" width="28" height="4" rx="2" fill="#1a73e8" opacity="0.7"/>
+
+  <!-- Save disk icon -->
+  <circle cx="78" cy="82" r="14" fill="#4CAF50"/>
+  <rect x="72" y="76" width="12" height="12" rx="1" fill="white"/>
+  <rect x="74" y="88" width="8" height="4" rx="1" fill="white"/>
+</svg>
