@@ -32,3 +32,4 @@ settings.local.json**/output/
 **/workflows/collected_articles.json
 **/workflows/article_cache.json
 .claude/skills/x-following-fetcher/x_curl.txt
+airss/.env
