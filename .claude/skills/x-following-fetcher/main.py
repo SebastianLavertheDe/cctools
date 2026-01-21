@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent / ".env")
 
 OUTPUT_DIR = Path("/home/say/cctools/x")
+POSTED_IDS_FILE = OUTPUT_DIR / "posted_ids.json"
 
 NOTION_KEY = os.getenv("notion_key") or ""
 NOTION_DATABASE_ID = os.getenv("NOTION_DATABASE_ID") or ""
@@ -24,6 +25,37 @@ NOTION_PAGE_ID = os.getenv("NOTION_PAGE_ID") or ""
 
 notion_client = None
 image_uploader = None
+
+
+def get_posted_ids() -> set:
+    """Load already posted tweet IDs from file"""
+    if POSTED_IDS_FILE.exists():
+        try:
+            with open(POSTED_IDS_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return set(data.get('ids', []))
+        except Exception:
+            return set()
+    return set()
+
+
+def save_posted_id(tweet_id: str):
+    """Append a new posted tweet ID to file"""
+    posted_ids = get_posted_ids()
+    posted_ids.add(tweet_id)
+    with open(POSTED_IDS_FILE, 'w', encoding='utf-8') as f:
+        json.dump({'ids': list(posted_ids)}, f, ensure_ascii=False)
+
+
+def parse_twitter_date(twitter_date: str) -> str:
+    """Convert Twitter date format to ISO 8601 format"""
+    try:
+        # Twitter format: "Wed Jan 21 13:59:24 +0000 2026"
+        dt = datetime.strptime(twitter_date, "%a %b %d %H:%M:%S %z %Y")
+        return dt.isoformat()
+    except Exception:
+        # Fallback: return original if parsing fails
+        return twitter_date
 
 
 def init_notion():
@@ -152,6 +184,28 @@ def parse_tweet_entry(entry: dict[str, Any]) -> dict[str, Any] | None:
                 for m in media:
                     if m.get("type") == "photo":
                         image_urls.append(m.get("media_url_https", m.get("media_url", "")))
+                
+                # For RT posts, also check for quoted or retweeted status media
+                if not image_urls:
+                    quoted_status = result.get("quoted_status_result", {})
+                    if quoted_status:
+                        quoted_legacy = quoted_status.get("result", {}).get("legacy", {})
+                        quoted_entities = quoted_legacy.get("extended_entities", {})
+                        quoted_media = quoted_entities.get("media", [])
+                        for m in quoted_media:
+                            if m.get("type") == "photo":
+                                image_urls.append(m.get("media_url_https", m.get("media_url", "")))
+                
+                # Also check in retweeted_status for media
+                if not image_urls:
+                    retweeted_result = result.get("retweeted_status_result", {})
+                    if retweeted_result:
+                        rt_legacy = retweeted_result.get("result", {}).get("legacy", {})
+                        rt_entities = rt_legacy.get("extended_entities", {})
+                        rt_media = rt_entities.get("media", [])
+                        for m in rt_media:
+                            if m.get("type") == "photo":
+                                image_urls.append(m.get("media_url_https", m.get("media_url", "")))
 
                 return {
                     "id": legacy.get("id_str", ""),
@@ -197,7 +251,7 @@ def execute_curl_from_file() -> subprocess.CompletedProcess:
         cmd_list,
         capture_output=True,
         text=True,
-        timeout=30
+        timeout=120
     )
 
 
@@ -215,7 +269,7 @@ def fetch_tweets() -> list[dict[str, Any]]:
 
         tweets = []
         seen_ids = set()
-
+        
         for instruction in instructions:
             if instruction.get("type") == "TimelineAddEntries":
                 entries = instruction.get("entries", [])
@@ -304,12 +358,22 @@ def push_to_notion(tweet: dict) -> bool:
     try:
         tweet_url = "https://x.com/" + tweet['user_screen_name'] + "/status/" + tweet['id']
         user_name = tweet.get('user_name', tweet['user_screen_name'])
-        content = tweet['content'][:1900]
+        content = tweet['content']
         
+        # Build properties with Link, Author, and Date fields
         properties = {
             'Title': {'title': [{'text': {'content': '@' + tweet['user_screen_name'] + ' - ' + user_name}}]},
             'type': {'rich_text': [{'type': 'text', 'text': {'content': 'x'}}]},
+            'Link': {'url': tweet_url},
+            'Author': {'rich_text': [{'type': 'text', 'text': {'content': user_name}}]},
+            'Date': {'date': {'start': parse_twitter_date(tweet['created_at'])}},
         }
+        
+        # Get cover image from first image_url if available
+        cover = None
+        image_urls = tweet.get('image_urls', [])
+        if image_urls:
+            cover = {'type': 'external', 'external': {'url': image_urls[0]}}
         
         children = [
             {'object': 'block', 'type': 'paragraph', 'paragraph': {'rich_text': [{'type': 'text', 'text': {'content': 'Link: ' + tweet_url}}]}},
@@ -318,11 +382,24 @@ def push_to_notion(tweet: dict) -> bool:
         ]
         
         if content:
-            children.append({'object': 'block', 'type': 'paragraph', 'paragraph': {'rich_text': [{'type': 'text', 'text': {'content': content}}]}})
+            # Split content into multiple blocks if it exceeds Notion's 2000 char limit
+            chunk_size = 1900
+            for i in range(0, len(content), chunk_size):
+                chunk = content[i:i + chunk_size]
+                children.append({
+                    'object': 'block',
+                    'type': 'paragraph',
+                    'paragraph': {'rich_text': [{'type': 'text', 'text': {'content': chunk}}]}
+                })
         
-        # Add images from tweet
-        image_urls = tweet.get('image_urls', [])
+        # Add embed tweet block
+        children.append({
+            'object': 'block',
+            'type': 'embed',
+            'embed': {'url': tweet_url}
+        })
         
+        # Add all images to content (first image is also used as cover)
         for img_url in image_urls[:4]:
             children.append({
                 'object': 'block',
@@ -338,8 +415,12 @@ def push_to_notion(tweet: dict) -> bool:
         notion_client.pages.create(
             parent={'database_id': NOTION_DATABASE_ID},
             properties=properties,
-            children=children
+            children=children,
+            cover=cover
         )
+        
+        # Save ID to local file after successful push
+        save_posted_id(tweet['id'])
         
         print(f"  ✅ 已推送到 Notion: @{tweet['user_screen_name']}")
         return True
@@ -364,46 +445,11 @@ def main():
     
     if new_count > 0 and init_notion():
         print("\n推送到 Notion...")
-        # Check what's already in Notion by querying pages
-        notion_ids = set()
-        try:
-            resp = requests.post(
-                'https://api.notion.com/v1/databases/' + NOTION_DATABASE_ID + '/query',
-                headers={
-                    'Authorization': f'Bearer {NOTION_KEY}',
-                    'Notion-Version': '2022-06-28',
-                    'Content-Type': 'application/json'
-                },
-                json={'page_size': 100}
-            )
-            if resp.status_code == 200:
-                for page in resp.json()['results']:
-                    # Get tweet ID from page content
-                    page_id = page['id']
-                    blocks_resp = requests.get(
-                        f'https://api.notion.com/v1/blocks/{page_id}/children',
-                        headers={
-                            'Authorization': f'Bearer {NOTION_KEY}',
-                            'Notion-Version': '2022-06-28'
-                        }
-                    )
-                    if blocks_resp.status_code == 200:
-                        for block in blocks_resp.json().get('results', []):
-                            if block.get('type') == 'paragraph':
-                                for text in block.get('paragraph', {}).get('rich_text', []):
-                                    link = text.get('text', {}).get('content', '')
-                                    if 'x.com/' in link and '/status/' in link:
-                                        parts = link.split('/status/')
-                                        if len(parts) > 1:
-                                            tweet_id = parts[1].split('?')[0].split()[0]
-                                            if tweet_id:
-                                                notion_ids.add(tweet_id)
-        except Exception as e:
-            print(f"  ⚠️ 无法检查Notion已有帖子: {e}")
+        # Use local file for deduplication
+        posted_ids = get_posted_ids()
+        print(f"  已推送帖子: {len(posted_ids)} 条")
         
-        print(f"  Notion已有帖子: {len(notion_ids)} 条")
-        
-        new_tweets = [t for t in tweets if t["id"] not in notion_ids]
+        new_tweets = [t for t in tweets if t["id"] not in posted_ids]
         print(f"  待推送新帖子: {len(new_tweets)}")
         
         for i, tweet in enumerate(new_tweets):
