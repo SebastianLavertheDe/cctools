@@ -244,7 +244,24 @@ class ContentExtractor:
                 if filename:
                     filename_to_idx[filename] = i + 1
 
-            for elem in main_content.descendants:
+            # Track processed elements to avoid duplicates
+            processed = set()
+
+            # Process elements in DOM order to preserve image positions in content
+            # Get all relevant elements in order
+            all_elements = main_content.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'ul', 'ol', 'img', 'iframe'])
+            
+            for elem in all_elements:
+                elem_id = id(elem)
+                if elem_id in processed:
+                    continue
+
+                # Check if this element is nested inside another list/block element
+                parent = elem.find_parent(['ul', 'ol', 'li', 'p', 'blockquote', 'pre'])
+                if parent and id(parent) in processed:
+                    continue
+
+                # Handle images
                 if elem.name == 'img':
                     src = elem.get('src', '')
                     if not src:
@@ -285,8 +302,10 @@ class ContentExtractor:
                     idx = filename_to_idx.get(src_filename, len(filename_to_idx) + 1)
 
                     content_parts.append(f'\n\n![图片{idx}]({abs_src})\n\n')
+                    processed.add(elem_id)
+                
+                # Handle iframes (videos)
                 elif elem.name == 'iframe':
-                    # Handle video embeds (YouTube, Vimeo, etc.)
                     src = elem.get('src', '')
                     if src:
                         # Convert embed URLs to watchable URLs
@@ -313,25 +332,82 @@ class ContentExtractor:
                         # Add video link
                         if any(domain in src for domain in ['youtube.com', 'youtu.be', 'vimeo.com', 'player.vimeo.com']):
                             content_parts.append(f'\n[视频]({video_url})\n')
-                elif elem.name in ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'pre', 'code']:
-                    text = elem.get_text(strip=True)
-                    if text:
-                        # Add heading markers
-                        if elem.name == 'h1':
-                            content_parts.append(f'\n# {text}\n')
-                        elif elem.name == 'h2':
-                            content_parts.append(f'\n## {text}\n')
-                        elif elem.name == 'h3':
-                            content_parts.append(f'\n### {text}\n')
-                        elif elem.name == 'h4':
-                            content_parts.append(f'\n#### {text}\n')
-                        elif elem.name in ['li']:
-                            content_parts.append(f'- {text}\n')
-                        elif elem.name == 'blockquote':
-                            content_parts.append(f'> {text}\n')
-                        else:
-                            content_parts.append(f'{text}\n')
-                elif elem.name == 'br':
+                    processed.add(elem_id)
+
+                # Handle lists
+                elif elem.name in ['ul', 'ol']:
+                    # Check if this is a metadata list (skip it)
+                    elem_classes = elem.get('class', []) or []
+                    if any('details' in str(c).lower() for c in elem_classes):
+                        processed.add(elem_id)
+                        continue
+
+                    # Process list items
+                    for li in elem.find_all('li', recursive=False):
+                        # Check if this is a metadata list item
+                        li_classes = li.get('class', []) or []
+                        if any('details' in str(c).lower() or 'hero_blog_post' in str(c).lower() for c in li_classes):
+                            continue
+
+                        text = li.get_text(strip=True)
+                        if text:
+                            # Also skip by content patterns
+                            if any(text.startswith(p) for p in ['Category', 'Product', 'Date', 'Reading time', 'Copy link']):
+                                continue
+
+                            if elem.name == 'ul':
+                                content_parts.append(f'- {text}\n')
+                            else:
+                                # Get the index from the parent
+                                idx = 1
+                                for prev_li in li.find_previous_siblings('li'):
+                                    idx += 1
+                                content_parts.append(f'{idx}. {text}\n')
+                        processed.add(id(li))
+                    processed.add(elem_id)
+                
+                # Handle text elements (headings, paragraphs, blockquotes, code)
+                elif elem.name in ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'code']:
+                    # Skip h1 titles since they're already added at the file level
+                    if elem.name == 'h1':
+                        processed.add(elem_id)
+                        continue
+                    
+                    if elem.name in ['pre', 'code']:
+                        # Preserve original formatting for code blocks
+                        text = elem.get_text()
+                        if text:
+                            # Use markdown code block format
+                            content_parts.append(f'\n```\n{text}\n```\n')
+                    else:
+                        text = elem.get_text(strip=True)
+                        if text:
+                            # Skip metadata items (short, label-value pairs)
+                            # These are typically things like "CategoryCoding", "ProductClaude Code", "DateNovember 25, 2025"
+                            if elem.name == 'p':
+                                # Skip if text starts with known metadata labels
+                                metadata_prefixes = ['Category', 'Product', 'Date', 'Reading time', 'Copy link', 'CategoryCoding', 'ProductClaude']
+                                if any(text.startswith(prefix) or text.replace(' ', '') == prefix for prefix in metadata_prefixes):
+                                    processed.add(elem_id)
+                                    continue
+                            # Add heading markers with proper newlines
+                            if elem.name == 'h2':
+                                content_parts.append(f'\n\n## {text}\n\n')
+                            elif elem.name == 'h3':
+                                content_parts.append(f'\n\n### {text}\n\n')
+                            elif elem.name == 'h4':
+                                content_parts.append(f'\n\n#### {text}\n\n')
+                            elif elem.name == 'blockquote':
+                                content_parts.append(f'\n> {text}\n')
+                            else:
+                                content_parts.append(f'\n{text}\n')
+                    processed.add(elem_id)
+
+            # Handle line breaks
+            for br in main_content.find_all('br'):
+                # Only process br if not inside a processed element
+                parent = br.find_parent(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'li'])
+                if not parent or id(parent) not in processed:
                     content_parts.append('\n')
 
             # Clean up excessive newlines
