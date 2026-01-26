@@ -33,9 +33,11 @@ class RSSManager:
             self.notion_manager = None
             print("Notion sync disabled (notion.sync: false)")
 
-        # Setup article directory (in cctools root)
-        self.article_dir = Path(__file__).parent.parent.parent.parent.parent.parent / "article"
-        self.article_dir.mkdir(exist_ok=True)
+        # Setup article directory (in project mymind, organized by week)
+        # Go up from .claude/skills/rss-article-saver/ to project root
+        project_root = Path(__file__).parent.parent.parent.parent.parent.parent
+        self.article_base_dir = project_root / "mymind" / "article"
+        self.article_base_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize AI client based on config
         try:
@@ -108,7 +110,7 @@ class RSSManager:
         )
 
     def _process_article(self, article: Article) -> None:
-        """Process single article: extract content, AI analyze, sync to Notion"""
+        """Process single article: extract content, sync to Notion, save to local"""
         print(f"\n  Processing: {article.title[:50]}...")
 
         # Extract full content
@@ -120,18 +122,6 @@ class RSSManager:
         if extracted.get('author'):
             article.author = extracted['author']
 
-        # AI Analysis
-        if self.ai_client:
-            print("    Analyzing with AI...")
-            self._analyze_article(article)
-
-        # Check score threshold (skip if score < 30) - NOTE: Lowered for testing
-        if article.ai_score is not None and article.ai_score < 30:
-            print(f"    Score: {article.ai_score}/100 - Skipped (below threshold)")
-            # Still add to cache to avoid reprocessing
-            self.cache_manager.add_article_to_cache(article)
-            return
-
         # Sync to Notion
         if self.notion_sync_enabled and self.notion_manager and self.notion_manager.enabled:
             print("    Syncing to Notion...")
@@ -140,15 +130,14 @@ class RSSManager:
         # Add to cache
         self.cache_manager.add_article_to_cache(article)
 
-        # Save original article to file (only if score >= 62)
+        # Save article to file
         self._save_article(article)
 
     def _save_article(self, article: Article) -> None:
-        """Save article to articles directory as Markdown"""
+        """Save article to mymind/article directory organized by week as Markdown"""
         try:
-            # Use AI translated title for filename, fallback to original
-            title_for_filename = article.translated_title if article.translated_title else article.title
-            title_for_filename = title_for_filename[:100]
+            # Use original title for filename
+            title_for_filename = article.title[:100]
 
             # Create safe filename (keep Chinese characters)
             safe_title = title_for_filename.replace('/', '-').replace('\\', '-')
@@ -157,10 +146,17 @@ class RSSManager:
             # Only replace special characters, keep alphanumeric and Chinese
             safe_title = ''.join(c if c.isalnum() or c > '\u4e00' and c < '\u9fff' or c in (' ', '-', '_') else '_' for c in safe_title)
 
-            # Create filename with timestamp
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = f"{timestamp}_{safe_title}.md"
-            filepath = self.article_dir / filename
+            # Use title as filename (without timestamp)
+            filename = f"{safe_title}.md"
+
+            # Get week directory (format: YYYY-Www)
+            now = datetime.now()
+            year, week, _ = now.isocalendar()
+            week_dir_name = f"{year}-W{week:02d}"
+            week_dir = self.article_base_dir / week_dir_name
+            week_dir.mkdir(exist_ok=True)
+
+            filepath = week_dir / filename
 
             # Build Markdown content
             md_content = []
@@ -173,25 +169,9 @@ class RSSManager:
             md_content.append(f"- **链接**: {article.link}")
             md_content.append(f"- **作者**: {article.author}")
             md_content.append(f"- **发布时间**: {article.published}")
-            if article.ai_score is not None:
-                md_content.append(f"- **评分**: {article.ai_score}/100")
-            if article.ai_category:
-                md_content.append(f"- **分类**: {article.ai_category}")
             md_content.append(f"- **保存时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
 
-            # AI Analysis (if available)
-            if article.ai_summary:
-                md_content.append("## AI 分析\n")
-                md_content.append(f"{article.ai_summary}\n")
-
-            # Images list (if available)
-            if article.image_urls:
-                md_content.append("## 文章图片\n")
-                for idx, img_url in enumerate(article.image_urls, 1):
-                    md_content.append(f"![图片{idx}]({img_url})\n")
-                md_content.append("")
-
-            # Original Content (images are embedded in content now)
+            # Original Content (images are embedded in content)
             md_content.append("## 正文\n")
             md_content.append(f"{article.full_content}\n")
 
@@ -199,7 +179,7 @@ class RSSManager:
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write('\n'.join(md_content))
 
-            print(f"    Saved to: {filename}")
+            print(f"    Saved to: {filepath}")
         except Exception as e:
             print(f"    Warning: Failed to save article: {e}")
 

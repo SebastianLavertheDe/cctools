@@ -1,21 +1,20 @@
 ---
 name: rss-article-saver
-description: RSS article subscription with AI scoring, save high-quality articles (score>=70) to local Markdown and Notion
+description: RSS article subscription, syncs articles to Notion and saves as local Markdown
 allowed-tools: Bash,Write,Read
 ---
 
 # RSS Article Saver
 
-Subscribes to multiple RSS feeds (configured via OPML), uses AI to score articles, and saves high-quality articles (score>=70) as local Markdown files and syncs to Notion.
+Subscribes to RSS feeds (configured via OPML), syncs articles to Notion (with images), and saves as local Markdown files.
 
 ## Features
 
-- 📡 **Multi-RSS Support**: Subscribe to multiple feeds via OPML file
-- 🤖 **AI Scoring**: Uses DeepSeek AI to score articles (0-100)
-- 🎯 **Smart Filtering**: Only saves articles with score >= 70
-- 📝 **Markdown Export**: Saves articles as Markdown with embedded images
-- 📊 **Notion Sync**: Syncs high-quality articles to Notion database
-- 🔍 **AI Analysis**: Generates Chinese summary, title translation, and categorization
+- 📡 **RSS Support**: Subscribe to feeds via OPML file
+- 📝 **Markdown Export**: Saves articles as Markdown with embedded images to ~/mymind/article/
+- 📊 **Notion Sync**: Syncs articles to Notion database with images
+- 🔄 **Deduplication**: Skips already synced articles using cache
+- 🖼️ **Image Support**: Extracts and includes article images
 
 ## Usage
 
@@ -31,14 +30,8 @@ uv run --env-file .env python main.py
 
 Required:
 ```bash
-DEEPSEEK_API_KEY=sk-xxx  # For AI analysis and scoring
 notion_key=secret_xxx      # Notion integration token
 NOTION_DATABASE_ID=xxx     # Target Notion database ID
-```
-
-Optional:
-```bash
-AI_MODEL=deepseek-chat      # AI model (default: deepseek-chat)
 ```
 
 ### 2. OPML File (subscriptions.opml)
@@ -65,34 +58,31 @@ Create a Notion database with these properties:
 - **Title** (Title)
 - **Link** (URL)
 - **Author** (Text)
-- **Summary** (Text)
-- **Category** (Select)
-- **Score** (Number)
-- **Status** (Status)
+- **Status** (Status) - Optional
 
 ### 4. Config File (config.yaml)
 
 Adjust settings in `config.yaml`:
 - `opml_file`: Path to your OPML file
-- `max_articles_per_feed`: Max articles per feed (default: 1)
-- `ai.enabled`: Enable/disable AI features
-- `ai.categories`: Available article categories
+- `max_articles_per_feed`: Max articles per feed (default: 999)
+- `ai.enabled`: AI features disabled by default
+- `notion.sync`: Enable/disable Notion sync
 
 ## Output
 
 ### Saved Articles
 
-Articles are saved to `/home/say/cctools/article/` as Markdown files:
+Articles are saved to `~/mymind/article/` as Markdown files:
 ```
 YYYYMMDD_HHMMSS_Article Title.md
 ```
 
 Each article contains:
-- **元数据**: Link, author, published date, score, category
-- **AI 分析**: Full AI analysis (summary, key points, evidence, value, scoring)
+- **元数据**: Link, author, published date, saved time
+- **文章图片**: List of image URLs
 - **正文**: Full content with images embedded in Markdown format
 
-### Filtering
+### Deduplication
 
-- Articles with **score < 70** are skipped (not saved, not synced)
-- Articles with **score >= 70** are saved as Markdown and synced to Notion
+- Uses `article_cache.json` to track processed articles
+- Already synced articles are skipped automatically

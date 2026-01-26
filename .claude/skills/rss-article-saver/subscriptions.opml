@@ -4,6 +4,6 @@
         <title>RSS Subscriptions</title>
     </head>
     <body>
-        <outline text="Anthropic Engineering" title="Anthropic Engineering" type="rss" xmlUrl="https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_engineering.xml"/>
+        <outline text="Claude Blog" title="Claude Blog" type="rss" xmlUrl="https://raw.githubusercontent.com/SebastianLavertheDe/blog-rss-feed/main/rss/claude_blog_rss.xml" />
     </body>
 </opml>

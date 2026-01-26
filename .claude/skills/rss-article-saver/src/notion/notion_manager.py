@@ -48,12 +48,11 @@ class BlogNotionManager:
             return False
 
         try:
-            # Build page properties - mapped to Reading List database schema
-            title_to_use = article.translated_title if article.translated_title else article.title
+            # Build page properties
             properties = {
                 "Title": {
                     "title": [{
-                        "text": {"content": title_to_use[:100]}
+                        "text": {"content": article.title[:100]}
                     }]
                 },
                 "Link": {
@@ -61,33 +60,10 @@ class BlogNotionManager:
                 },
                 "Author": {
                     "rich_text": [{"text": {"content": article.author}}]
+                },
+                "Status": {
+                    "status": {"name": "Not Started"}
                 }
-            }
-
-            # Add AI summary if available (only first sentence)
-            if article.ai_summary:
-                first_sentence = article.ai_summary.split('。')[0].split('！')[0].split('？')[0].split('. ')[0].split('!')[0].split('?')[0].strip()
-                if not first_sentence:
-                    first_sentence = article.ai_summary[:200]
-                properties["Summary"] = {
-                    "rich_text": [{"text": {"content": first_sentence[:500]}}]
-                }
-
-            # Add AI category if available
-            if article.ai_category:
-                properties["Category"] = {
-                    "select": {"name": article.ai_category}
-                }
-
-            # Add AI score if available
-            if article.ai_score is not None:
-                properties["Score"] = {
-                    "number": article.ai_score
-                }
-
-            # Set Status to "Not Started"
-            properties["Status"] = {
-                "status": {"name": "Not Started"}
             }
 
             # Create page with content
@@ -123,15 +99,10 @@ class BlogNotionManager:
             return False
 
     def _build_page_content(self, article: 'Article') -> list:
-        """Build Notion page content blocks - AI summary + uploaded images only"""
+        """Build Notion page content blocks - article images only"""
         children = []
 
-        # Add AI analysis summary
-        if article.ai_summary:
-            md_blocks = self._markdown_to_blocks(article.ai_summary)
-            children.extend(md_blocks)
-
-        # Upload and add images from the original article
+        # Add images from the original article
         if article.image_urls:
             # Add a divider before images
             children.append({"type": "divider", "divider": {}})
