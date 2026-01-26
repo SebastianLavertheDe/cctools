@@ -35,3 +35,9 @@ ai:
 # Notion sync settings
 notion:
   sync: true  # Set to true to enable Notion sync
+
+# Translation settings
+translation:
+  enabled: true  # Enable translation to Chinese
+  provider: nvidia  # Options: nvidia (for minimax model)
+  model: minimaxai/minimax-m2.1  # NVIDIA model ID

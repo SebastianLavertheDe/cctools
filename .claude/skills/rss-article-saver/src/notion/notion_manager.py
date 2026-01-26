@@ -61,6 +61,9 @@ class BlogNotionManager:
                 "Author": {
                     "rich_text": [{"text": {"content": article.author}}]
                 },
+                "type": {
+                    "rich_text": [{"text": {"content": "blog"}}]
+                },
                 "Status": {
                     "status": {"name": "Not Started"}
                 }

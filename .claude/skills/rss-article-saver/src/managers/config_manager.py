@@ -48,3 +48,7 @@ class RSSConfig:
     def get_notion_settings(self) -> Dict:
         """Get Notion sync settings"""
         return self.config.get('notion', {'sync': True})
+
+    def get_translation_settings(self) -> Dict:
+        """Get translation settings"""
+        return self.config.get('translation', {'enabled': False, 'provider': 'nvidia'})

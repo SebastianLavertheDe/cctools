@@ -62,6 +62,26 @@ class RSSManager:
             print(f"AI client init failed: {e}")
             self.ai_client = None
 
+        # Initialize translator based on config
+        try:
+            translation_config = config.get_translation_settings()
+            self.translation_enabled = translation_config.get('enabled', False)
+            if self.translation_enabled:
+                translation_provider = translation_config.get('provider', 'nvidia').lower()
+                if translation_provider == 'nvidia':
+                    from ..ai.nvidia_client import NVIDIATranslator
+                    self.translator = NVIDIATranslator()
+                    print(f"Translation enabled (NVIDIA minimax)")
+                else:
+                    self.translator = None
+                    print(f"Translation provider '{translation_provider}' not supported")
+            else:
+                self.translator = None
+        except Exception as e:
+            print(f"Translator init failed: {e}")
+            self.translator = None
+            self.translation_enabled = False
+
     def fetch_feed(self, feed: RSSFeed):
         """Fetch a single RSS feed"""
         try:
@@ -78,11 +98,15 @@ class RSSManager:
     def process_feed(self, parsed_feed, feed_info: RSSFeed) -> None:
         """Process feed entries"""
         max_articles = self.config.get_max_articles_per_feed()
-        entries = parsed_feed.entries[:max_articles]
 
+        # First, filter out cached articles, then limit
         new_articles = []
 
-        for entry in entries:
+        for entry in parsed_feed.entries:
+            # Stop if we've reached the max limit
+            if len(new_articles) >= max_articles:
+                break
+
             link = entry.get('link', '')
 
             if self.cache_manager.is_article_cached(link):
@@ -110,7 +134,7 @@ class RSSManager:
         )
 
     def _process_article(self, article: Article) -> None:
-        """Process single article: extract content, sync to Notion, save to local"""
+        """Process single article: extract content, translate, sync to Notion, save to local"""
         print(f"\n  Processing: {article.title[:50]}...")
 
         # Extract full content
@@ -121,6 +145,19 @@ class RSSManager:
             article.image_urls = extracted['images']
         if extracted.get('author'):
             article.author = extracted['author']
+
+        # Translate content to Chinese if enabled
+        if self.translation_enabled and self.translator and article.full_content:
+            print("    Translating to Chinese...")
+            try:
+                translated_content = self.translator.translate_to_chinese(article.full_content)
+                if translated_content:
+                    article.full_content = translated_content
+                    print("    Translation completed")
+                else:
+                    print("    Warning: Translation failed, using original content")
+            except Exception as e:
+                print(f"    Warning: Translation error: {e}, using original content")
 
         # Sync to Notion
         if self.notion_sync_enabled and self.notion_manager and self.notion_manager.enabled:
