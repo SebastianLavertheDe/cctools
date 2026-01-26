@@ -32,7 +32,8 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Skill(rss-article-saver)",
-      "Bash(git -C /home/say/cctools log --oneline -10)"
+      "Bash(git -C /home/say/cctools log --oneline -10)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

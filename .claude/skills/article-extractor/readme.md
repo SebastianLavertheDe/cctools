@@ -1,1 +1,0 @@
-https://github.com/michalparkola/tapestry-skills-for-claude-code/blob/main/article-extractor/SKILL.md?plain=1
