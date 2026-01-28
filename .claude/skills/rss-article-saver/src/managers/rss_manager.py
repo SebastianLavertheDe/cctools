@@ -290,14 +290,14 @@ class RSSManager:
             # Use title as filename (without timestamp)
             filename = f"{safe_title}.md"
 
-            # Get week directory (format: YYYY-Www)
+            # Get date directory (format: YYYYMMDD)
             now = datetime.now()
-            year, week, _ = now.isocalendar()
-            week_dir_name = f"{year}-W{week:02d}"
-            week_dir = self.article_base_dir / week_dir_name
-            week_dir.mkdir(exist_ok=True)
+            year, month, day = now.year, now.month, now.day
+            date_dir_name = f"{year}{month:02d}{day:02d}"
+            date_dir = self.article_base_dir / date_dir_name
+            date_dir.mkdir(exist_ok=True)
 
-            filepath = week_dir / filename
+            filepath = date_dir / filename
 
             # Build Markdown content
             md_content = []
