@@ -78,6 +78,7 @@ class NVIDIASummarizer:
 
 ## 要求
 请以JSON格式输出总结，包含以下字段：
+- translated_title: 翻译后的中文标题
 - summary: 200-300字的摘要（中文）
 - key_points: 3-5个关键要点数组（每条20-50字）
 - category: 文章分类（AI, System Design, Backend, Frontend, DevOps, Other 之一）
@@ -121,11 +122,12 @@ class NVIDIASummarizer:
                         result = json.loads(json_str)
 
                         # Validate required fields
-                        if not all(key in result for key in ["summary", "key_points", "category", "score"]):
+                        if not all(key in result for key in ["translated_title", "summary", "key_points", "category", "score"]):
                             print(f"    Warning: Missing required fields in AI response")
                             return None
 
                         return {
+                            "translated_title": result.get("translated_title", title),
                             "summary": result.get("summary", ""),
                             "key_points": result.get("key_points", []),
                             "category": result.get("category", "Other"),

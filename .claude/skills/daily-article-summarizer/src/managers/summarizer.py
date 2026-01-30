@@ -48,7 +48,7 @@ class ArticleSummarizer:
             return None
 
         return ArticleSummary(
-            title=article.title,
+            title=result.get("translated_title", article.title),  # Use translated title
             file_path=article.file_path,
             source_url=article.link,
             author=article.author,
