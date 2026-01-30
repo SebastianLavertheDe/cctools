@@ -9,17 +9,20 @@ from typing import Optional, List
 @dataclass
 class Article:
     """Blog article data model"""
+
     title: str
     link: str
     author: str
     published: str
-    summary: str  # RSS excerpt
-    full_content: Optional[str] = None  # Extracted full content
-    image_urls: List[str] = field(default_factory=list)  # Extracted images
+    summary: str
+    full_content: Optional[str] = None
+    image_urls: List[str] = field(default_factory=list)
+    feed_type: str = "rss"
+    feed_category: str = "article"
+    comments: Optional[str] = None
 
-    # AI processed fields
-    translated_title: Optional[str] = None  # AI translated title
+    translated_title: Optional[str] = None
     ai_summary: Optional[str] = None
-    ai_score: Optional[int] = None  # AI score (0-100)
+    ai_score: Optional[int] = None
     ai_category: Optional[str] = None
     ai_tags: List[str] = field(default_factory=list)

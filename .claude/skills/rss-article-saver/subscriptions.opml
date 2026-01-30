@@ -4,6 +4,7 @@
         <title>RSS Subscriptions</title>
     </head>
     <body>
-        <outline text="Claude Blog" title="Claude Blog" type="rss" xmlUrl="https://raw.githubusercontent.com/SebastianLavertheDe/blog-rss-feed/main/rss/claude_blog_rss.xml" />
+        <outline text="Blog RSS" title="Blog RSS" type="blog" xmlUrl="https://raw.githubusercontent.com/SebastianLavertheDe/blog-rss-feed/main/blog_rss.xml" />
+        <!-- <outline text="Post RSS" title="Post RSS" type="post" xmlUrl="https://raw.githubusercontent.com/SebastianLavertheDe/blog-rss-feed/main/post_rss.xml" category="post" /> -->
     </body>
 </opml>

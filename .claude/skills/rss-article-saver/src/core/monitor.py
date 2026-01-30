@@ -43,6 +43,7 @@ class RSSMonitor:
                     print(f"Processing nested OPML feeds...")
                     nested_feeds = parsed_feed.get("feeds", [])
                     parent_title = parsed_feed.get("parent_title", feed.title)
+                    parent_category = parsed_feed.get("parent_category", feed.category)
 
                     for nested_feed in nested_feeds:
                         print(f"\n  {'-' * 40}")
@@ -54,7 +55,9 @@ class RSSMonitor:
                         nested_parsed = self.rss_manager.fetch_feed(nested_feed)
                         if nested_parsed:
                             print(f"  Entries: {len(nested_parsed.entries)}")
-                            self.rss_manager.process_feed(nested_parsed, nested_feed)
+                            self.rss_manager.process_feed(
+                                nested_parsed, nested_feed, parent_category
+                            )
                         else:
                             print(f"  Failed to fetch nested feed: {nested_feed.title}")
                 else:

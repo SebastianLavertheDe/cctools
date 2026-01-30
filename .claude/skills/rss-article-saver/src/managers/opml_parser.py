@@ -11,9 +11,12 @@ from dataclasses import dataclass
 @dataclass
 class RSSFeed:
     """RSS feed subscription"""
-    text: str  # Display name
-    title: str  # Feed title
-    url: str  # RSS feed URL
+
+    text: str
+    title: str
+    url: str
+    type: str = "rss"
+    category: str = "article"
 
 
 class OPMLParser:
@@ -38,29 +41,55 @@ class OPMLParser:
             tree = ET.parse(self.opml_file)
             root = tree.getroot()
 
-            # Find all outline elements with type="rss"
-            for outline in root.findall(".//outline[@type='rss']"):
-                text = outline.get('text', '')
-                title = outline.get('title', text)
-                url = outline.get('xmlUrl', '')
+            # Find all outline elements with type="rss", type="post", etc.
+            rss_outlines = root.findall(".//outline[@type='rss']")
+            post_outlines = root.findall(".//outline[@type='post']")
+            all_outlines = rss_outlines + post_outlines
+
+            for outline in all_outlines:
+                text = outline.get("text", "")
+                title = outline.get("title", text)
+                url = outline.get("xmlUrl", "")
+                feed_type = outline.get("type", "rss")
+                feed_category = outline.get("category", "article")
 
                 if url:
-                    feeds.append(RSSFeed(text=text, title=title, url=url))
+                    feeds.append(
+                        RSSFeed(
+                            text=text,
+                            title=title,
+                            url=url,
+                            type=feed_type,
+                            category=feed_category,
+                        )
+                    )
 
             print(f"Loaded {len(feeds)} RSS feeds from {self.opml_file}")
 
             # If no RSS feeds found, check for xmlUrl attribute without type
             if not feeds:
                 for outline in root.findall(".//outline[@xmlUrl]"):
-                    text = outline.get('text', '')
-                    title = outline.get('title', text)
-                    url = outline.get('xmlUrl', '')
+                    text = outline.get("text", "")
+                    title = outline.get("title", text)
+                    url = outline.get("xmlUrl", "")
+                    feed_type = outline.get("type", "rss")
+                    feed_category = outline.get("category", "article")
 
                     if url:
-                        feeds.append(RSSFeed(text=text, title=title, url=url))
+                        feeds.append(
+                            RSSFeed(
+                                text=text,
+                                title=title,
+                                url=url,
+                                type=feed_type,
+                                category=feed_category,
+                            )
+                        )
 
                 if feeds:
-                    print(f"Loaded {len(feeds)} RSS feeds from {self.opml_file} (without type attribute)")
+                    print(
+                        f"Loaded {len(feeds)} RSS feeds from {self.opml_file} (without type attribute)"
+                    )
 
             if not feeds:
                 print(f"Warning: No RSS feeds found in {self.opml_file}")

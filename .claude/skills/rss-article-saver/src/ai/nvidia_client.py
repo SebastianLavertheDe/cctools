@@ -6,7 +6,10 @@ NVIDIA AI Translation Client
 import os
 import time
 import requests
+import re
+import html
 from typing import Optional
+from bs4 import BeautifulSoup
 
 
 class NVIDIATranslator:
@@ -19,6 +22,25 @@ class NVIDIATranslator:
 
         if not self.api_key or not self.api_key.strip():
             raise ValueError("NVIDIA_API_KEY 未设置或为空")
+
+    def _clean_html_tags(self, text: str) -> str:
+        """清理文本中的 HTML 标签"""
+        try:
+            # 使用 BeautifulSoup 清理 HTML
+            soup = BeautifulSoup(text, 'html.parser')
+
+            # 移除所有标签但保留文本
+            clean_text = soup.get_text(separator='\n', strip=True)
+
+            # 清理多余的空行
+            clean_text = re.sub(r'\n{3,}', '\n\n', clean_text)
+
+            return clean_text.strip()
+        except:
+            # 如果 BeautifulSoup 失败，使用正则表达式作为后备
+            clean_text = re.sub(r'<[^>]+>', '\n', text)
+            clean_text = re.sub(r'\n{3,}', '\n\n', clean_text)
+            return clean_text.strip()
 
     def translate_to_chinese(self, text: str, max_retries: int = 3) -> Optional[str]:
         """
@@ -55,13 +77,18 @@ class NVIDIATranslator:
         }
 
         # Build the translation prompt
-        prompt = f"""请将以下 Markdown 文章翻译成中文。直接输出翻译结果，不要有任何分析、解释或思考过程。
+        prompt = f"""将以下文章翻译成中文。
 
-要求：
-- 保持 Markdown 格式
-- 代码块不翻译
-- URL 不翻译
-- 专业术语保持准确
+IMPORTANT RULES:
+- Output ONLY the translated text
+- NO explanations, notes, or thinking process
+- NO bullet points of instructions
+- NO planning or analysis
+- Start directly with the translated content
+- Keep Markdown format
+- Do not translate code blocks
+- Do not translate URLs
+- Keep technical terms accurate
 
 {text}"""
 
@@ -100,31 +127,96 @@ class NVIDIATranslator:
                     lines = translated_text.split("\n")
                     content_start = 0
 
-                    # Find first line with Chinese characters (highest priority)
+                    # Patterns that indicate non-content lines (AI thinking, instructions, etc.)
+                    skip_patterns = [
+                        "translate",
+                        "翻译",
+                        "let me",
+                        "i need to",
+                        "i'll",
+                        "first",
+                        "next",
+                        "then",
+                        "important",
+                        "keep",
+                        "规则",
+                        "要求",
+                        "output",
+                        "start",
+                        "planning",
+                        "analysis",
+                        "example",
+                        "technical"
+                    ]
+
+                    # Find first actual content line
+                    in_thinking_process = True  # Assume we start in thinking process
+                    consecutive_content_lines = 0
+                    min_content_lines = 3  # Need at least 3 lines of real content to confirm
+
                     for i, line in enumerate(lines):
                         stripped = line.strip()
                         if not stripped:
+                            if in_thinking_process:
+                                continue
+                            else:
+                                break  # Empty line after content means we're done
+
+                        # Skip lines that look like instructions or thinking
+                        line_lower = stripped.lower()
+
+                        # Check if this looks like a term/definition list (thinking pattern)
+                        is_term_list = (
+                            stripped.startswith(("-", "*", "•")) and
+                            ('"' in stripped or "'" in stripped) and
+                            (" - " in stripped or " — " in stripped or " – " in stripped)
+                        )
+
+                        if is_term_list:
+                            consecutive_content_lines = 0
                             continue
 
-                        has_chinese = any(
-                            "\u4e00" <= char <= "\u9fff" for char in stripped
-                        )
-                        if has_chinese:
-                            content_start = i
-                            break
+                        # Skip lines with thinking keywords
+                        if any(pattern in line_lower for pattern in skip_patterns):
+                            # But don't skip if it's a heading or substantial Chinese content
+                            has_chinese = any("\u4e00" <= char <= "\u9fff" for char in stripped)
+                            is_heading = stripped.startswith(("#", "##", "###"))
 
-                    # If no Chinese found, fall back to heading markers
-                    if content_start == 0:
-                        for i, line in enumerate(lines):
-                            stripped = line.strip()
-                            if not stripped:
-                                continue
-                            if stripped.startswith(("#", "##", "###", "!", "- ", "* ")):
+                            if is_heading:
                                 content_start = i
+                                in_thinking_process = False
                                 break
+
+                            if has_chinese and len(stripped) > 15 and not stripped.startswith("-"):
+                                # Substantial Chinese text, likely real content
+                                consecutive_content_lines += 1
+                                if consecutive_content_lines >= min_content_lines:
+                                    content_start = i - consecutive_content_lines + 1
+                                    in_thinking_process = False
+                                    break
+                            else:
+                                consecutive_content_lines = 0
+                                continue
+                        else:
+                            # No skip patterns found
+                            if stripped.startswith(("#", "##", "###")):
+                                content_start = i
+                                in_thinking_process = False
+                                break
+
+                            has_chinese = any("\u4e00" <= char <= "\u9fff" for char in stripped)
+                            if has_chinese and len(stripped) > 10:
+                                consecutive_content_lines += 1
+                                if consecutive_content_lines >= min_content_lines:
+                                    content_start = i - consecutive_content_lines + 1
+                                    in_thinking_process = False
+                                    break
 
                     if content_start > 0:
                         translated_text = "\n".join(lines[content_start:])
+
+                    # Clean any HTML tags that might be in the translation
+                    translated_text = self._clean_html_tags(translated_text)
 
                     return translated_text
 
