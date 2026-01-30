@@ -42,6 +42,99 @@ class NVIDIATranslator:
             clean_text = re.sub(r'\n{3,}', '\n\n', clean_text)
             return clean_text.strip()
 
+    def translate_title(self, title: str) -> Optional[str]:
+        """
+        将标题翻译成中文
+
+        Args:
+            title: 要翻译的标题
+
+        Returns:
+            翻译后的中文标题，失败时返回None
+        """
+        if not title or len(title.strip()) < 1:
+            return title
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+
+        # Use regular string concatenation to avoid f-string brace issues
+        prompt = "You are a professional translator. Translate the following title to Chinese.\n\n"
+        prompt += f"Original title: {title}\n\n"
+        prompt += """Output format (JSON):
+{"translation": "translated_title"}
+
+Rules:
+- Return ONLY the JSON object
+- Do NOT include any explanations
+- Do NOT include thinking process
+- Start your response directly with the JSON"""
+
+        payload = {
+            "messages": [{"role": "user", "content": prompt}],
+            "model": self.model,
+            "stream": False,
+            "temperature": 0.1,
+            "max_tokens": 150,
+        }
+
+        for attempt in range(3):
+            try:
+                response = requests.post(
+                    self.base_url, headers=headers, json=payload, timeout=30
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    content = (
+                        data.get("choices", [{}])[0]
+                        .get("message", {})
+                        .get("content", "")
+                        .strip()
+                    )
+
+                    # Try to parse as JSON
+                    import json
+                    try:
+                        # Find JSON in the content
+                        if '{' in content:
+                            start = content.find('{')
+                            end = content.rfind('}') + 1
+                            json_str = content[start:end]
+                            result = json.loads(json_str)
+                            if 'translation' in result:
+                                return result['translation'].strip()
+                    except:
+                        pass
+
+                    # Fallback: extract Chinese text more aggressively
+                    # Split by common delimiters and find the cleanest Chinese phrase
+                    import re
+                    # Try to find Chinese phrases
+                    chinese_matches = re.findall(r'[\u4e00-\u9fff]+[：:\s,，]*[\u4e00-\u9fff\s]*', content)
+                    if chinese_matches:
+                        # Return the longest match (likely the complete translation)
+                        return max(chinese_matches, key=len).strip()
+
+                    # Last resort: just find any Chinese text
+                    lines = content.split('\n')
+                    for line in lines:
+                        line = line.strip()
+                        if any('\u4e00' <= char <= '\u9fff' for char in line):
+                            # Extract just the Chinese part
+                            chinese_part = ''.join(c for c in line if '\u4e00' <= c <= '\u9fff' or c in '：，。、！？；：""''（）【】《》')
+                            if chinese_part and len(chinese_part) > 2:
+                                return chinese_part.strip()
+
+            except Exception as e:
+                if attempt < 2:
+                    time.sleep(1)
+
+        return None
+
     def translate_to_chinese(self, text: str, max_retries: int = 3) -> Optional[str]:
         """
         将文本翻译成中文（一次性翻译，不切割）
@@ -76,21 +169,25 @@ class NVIDIATranslator:
             "Content-Type": "application/json",
         }
 
-        # Build the translation prompt
-        prompt = f"""将以下文章翻译成中文。
+        # Build the translation prompt using JSON format to force clean output
+        # Escape the text for JSON
+        import json
+        escaped_text = text.replace('"', '\\"').replace('\n', '\\n')
 
-IMPORTANT RULES:
-- Output ONLY the translated text
-- NO explanations, notes, or thinking process
-- NO bullet points of instructions
-- NO planning or analysis
-- Start directly with the translated content
+        prompt = f"""You are a professional translator. Translate the following text to Chinese.
+
+Text to translate:
+{escaped_text}
+
+Output format (JSON):
+{{"translation": "translated_text_here}}
+
+Rules:
+- Return ONLY the JSON object
+- Do NOT include any explanations or thinking process
 - Keep Markdown format
-- Do not translate code blocks
-- Do not translate URLs
-- Keep technical terms accurate
-
-{text}"""
+- Do not translate code blocks or URLs
+- Keep technical terms accurate"""
 
         payload = {
             "messages": [{"role": "user", "content": prompt}],
@@ -114,9 +211,39 @@ IMPORTANT RULES:
                         .strip()
                     )
 
+                    # minimax model outputs: thinking process \n\n\n\n actual content
+                    # Split by multiple newlines and take the last substantial part
+                    if '\n\n\n\n' in translated_text:
+                        parts = translated_text.split('\n\n\n\n')
+                        # Take the last part that has content
+                        translated_text = parts[-1].strip()
+
+                    # Try to parse as JSON first (for title translation)
+                    import json
+                    try:
+                        # Look for ```json code block
+                        if '```json' in translated_text:
+                            start = translated_text.find('```json') + 7
+                            end = translated_text.find('```', start)
+                            if end > start:
+                                json_str = translated_text[start:end].strip()
+                                result = json.loads(json_str)
+                                if 'translation' in result:
+                                    return result['translation'].strip()
+
+                        # Look for JSON object anywhere
+                        if '{' in translated_text and 'translation' in translated_text:
+                            start = translated_text.find('{')
+                            end = translated_text.rfind('}') + 1
+                            json_str = translated_text[start:end]
+                            result = json.loads(json_str)
+                            if 'translation' in result:
+                                return result['translation'].strip()
+                    except:
+                        pass  # Fall through to regular cleaning
+
                     # Remove any potential markdown code block wrappers
                     if translated_text.startswith("```"):
-                        # Remove ```markdown or ``` at start
                         lines = translated_text.split("\n")
                         if lines[0].startswith("```"):
                             lines = lines[1:]
@@ -131,9 +258,11 @@ IMPORTANT RULES:
                     skip_patterns = [
                         "translate",
                         "翻译",
+                        "the user wants me to",
                         "let me",
                         "i need to",
                         "i'll",
+                        "i will",
                         "first",
                         "next",
                         "then",
@@ -145,75 +274,141 @@ IMPORTANT RULES:
                         "start",
                         "planning",
                         "analysis",
+                        "analyze",
+                        "analyzing",
                         "example",
-                        "technical"
+                        "technical",
+                        "this is an",
+                        "this is a",
+                        "here's a",
+                        "here is",
+                        "check if",
+                        "make sure"
                     ]
 
                     # Find first actual content line
-                    in_thinking_process = True  # Assume we start in thinking process
-                    consecutive_content_lines = 0
-                    min_content_lines = 3  # Need at least 3 lines of real content to confirm
+                    # Special handling for "The user wants me to translate" pattern
+                    has_thinking_pattern = any("the user wants me to" in line.lower() for line in lines[:20])
 
-                    for i, line in enumerate(lines):
-                        stripped = line.strip()
-                        if not stripped:
-                            if in_thinking_process:
+                    if has_thinking_pattern:
+                        # Aggressive mode: skip everything until we find substantial Chinese content
+                        in_thinking = True
+                        consecutive_chinese_lines = 0
+                        min_chinese_lines = 3
+
+                        for i, line in enumerate(lines):
+                            stripped = line.strip()
+                            if not stripped:
                                 continue
+
+                            line_lower = stripped.lower()
+
+                            # Check if we're still in thinking mode
+                            if in_thinking:
+                                # Look for end of thinking patterns
+                                if any(marker in line_lower for marker in ["i'll translate", "here's the translation:", "translation:"]):
+                                    in_thinking = False
+                                    consecutive_chinese_lines = 0
+                                    continue
+
+                                # Skip thinking lines
+                                if any(pattern in line_lower for pattern in skip_patterns):
+                                    continue
+
+                                # Check if this line has substantial Chinese content
+                                chinese_count = sum(1 for c in stripped if "\u4e00" <= c <= "\u9fff")
+                                if chinese_count >= 5 and (chinese_count / len(stripped)) > 0.4:
+                                    consecutive_chinese_lines += 1
+                                    if consecutive_chinese_lines >= min_chinese_lines:
+                                        content_start = i - consecutive_chinese_lines + 1
+                                        break
+                                else:
+                                    consecutive_chinese_lines = 0
                             else:
-                                break  # Empty line after content means we're done
-
-                        # Skip lines that look like instructions or thinking
-                        line_lower = stripped.lower()
-
-                        # Check if this looks like a term/definition list (thinking pattern)
-                        is_term_list = (
-                            stripped.startswith(("-", "*", "•")) and
-                            ('"' in stripped or "'" in stripped) and
-                            (" - " in stripped or " — " in stripped or " – " in stripped)
-                        )
-
-                        if is_term_list:
-                            consecutive_content_lines = 0
-                            continue
-
-                        # Skip lines with thinking keywords
-                        if any(pattern in line_lower for pattern in skip_patterns):
-                            # But don't skip if it's a heading or substantial Chinese content
-                            has_chinese = any("\u4e00" <= char <= "\u9fff" for char in stripped)
-                            is_heading = stripped.startswith(("#", "##", "###"))
-
-                            if is_heading:
-                                content_start = i
-                                in_thinking_process = False
-                                break
-
-                            if has_chinese and len(stripped) > 15 and not stripped.startswith("-"):
-                                # Substantial Chinese text, likely real content
-                                consecutive_content_lines += 1
-                                if consecutive_content_lines >= min_content_lines:
-                                    content_start = i - consecutive_content_lines + 1
-                                    in_thinking_process = False
+                                # After thinking ended, find first real content
+                                chinese_count = sum(1 for c in stripped if "\u4e00" <= c <= "\u9fff")
+                                if chinese_count >= 3:
+                                    content_start = i
                                     break
-                            else:
+                    else:
+                        # Original logic for non-pattern cases
+                        in_thinking_process = True
+                        consecutive_content_lines = 0
+                        min_content_lines = 5
+                        thinking_ended = False
+
+                        for i, line in enumerate(lines):
+                            stripped = line.strip()
+                            if not stripped:
+                                if in_thinking_process:
+                                    continue
+                                else:
+                                    break
+
+                            line_lower = stripped.lower()
+
+                            is_term_list = (
+                                stripped.startswith(("-", "*", "•")) and
+                                ('"' in stripped or "'" in stripped) and
+                                (" - " in stripped or " — " in stripped or " – " in stripped)
+                            )
+
+                            if is_term_list:
                                 consecutive_content_lines = 0
                                 continue
-                        else:
-                            # No skip patterns found
-                            if stripped.startswith(("#", "##", "###")):
-                                content_start = i
-                                in_thinking_process = False
-                                break
 
-                            has_chinese = any("\u4e00" <= char <= "\u9fff" for char in stripped)
-                            if has_chinese and len(stripped) > 10:
-                                consecutive_content_lines += 1
-                                if consecutive_content_lines >= min_content_lines:
-                                    content_start = i - consecutive_content_lines + 1
+                            if not thinking_ended:
+                                if any(marker in line_lower for marker in ["i'll translate", "let me translate", "here's the translation"]):
+                                    thinking_ended = True
+                                    consecutive_content_lines = 0
+                                    continue
+
+                            if not thinking_ended and any(pattern in line_lower for pattern in skip_patterns):
+                                consecutive_content_lines = 0
+                                continue
+                            else:
+                                has_chinese = any("\u4e00" <= char <= "\u9fff" for char in stripped)
+                                is_heading = stripped.startswith(("#", "##", "###"))
+
+                                if is_heading:
+                                    content_start = i
                                     in_thinking_process = False
                                     break
+
+                                chinese_char_count = sum(1 for c in stripped if "\u4e00" <= c <= "\u9fff")
+                                total_char_count = len(stripped)
+
+                                if has_chinese and chinese_char_count >= 3 and (chinese_char_count / max(total_char_count, 1)) > 0.3:
+                                    consecutive_content_lines += 1
+                                    if consecutive_content_lines >= min_content_lines:
+                                        content_start = i - consecutive_content_lines + 1
+                                        in_thinking_process = False
+                                        break
+                                else:
+                                    consecutive_content_lines = 0
 
                     if content_start > 0:
                         translated_text = "\n".join(lines[content_start:])
+
+                        # Additional cleanup: remove any remaining thinking patterns after content
+                        # Split by double newlines and keep only paragraphs with substantial Chinese
+                        paragraphs = translated_text.split("\n\n")
+                        clean_paragraphs = []
+                        for para in paragraphs:
+                            para = para.strip()
+                            if not para:
+                                continue
+                            # Skip paragraphs with thinking patterns
+                            para_lower = para.lower()
+                            if any(pattern in para_lower for pattern in ["actually, looking", "let me refine", "i'll refine", "given the context"]):
+                                continue
+                            # Keep paragraphs with substantial Chinese content
+                            chinese_count = sum(1 for c in para if "\u4e00" <= c <= "\u9fff")
+                            if chinese_count >= 10:
+                                clean_paragraphs.append(para)
+
+                        if clean_paragraphs:
+                            translated_text = "\n\n".join(clean_paragraphs)
 
                     # Clean any HTML tags that might be in the translation
                     translated_text = self._clean_html_tags(translated_text)

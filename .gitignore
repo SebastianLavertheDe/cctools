@@ -35,4 +35,5 @@ settings.local.json**/output/
 airss/.env
 
 # Local article storage
-mymind/
+mymind/article/
+mymind/post/

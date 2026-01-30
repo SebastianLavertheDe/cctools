@@ -248,6 +248,8 @@ class RSSManager:
             full_content=full_content_from_rss,  # Use RSS content if available
             feed_type=feed_info.type,
             feed_category=category,
+            feed_name=feed_info.title,  # Store RSS feed name
+            feed_url=feed_info.url,  # Store RSS feed URL
         )
 
     def _process_article(self, article: Article) -> None:
@@ -279,12 +281,20 @@ class RSSManager:
         if self.translation_enabled and self.translator and article.full_content:
             print("    Translating to Chinese...")
             try:
+                # Translate title
+                if hasattr(self.translator, 'translate_title'):
+                    translated_title = self.translator.translate_title(article.title)
+                    if translated_title:
+                        article.translated_title = translated_title
+                        print(f"    Title translated: {translated_title}")
+
+                # Translate content
                 translated_content = self.translator.translate_to_chinese(
                     article.full_content
                 )
                 if translated_content:
                     article.full_content = translated_content
-                    print("    Translation completed")
+                    print("    Content translation completed")
                 else:
                     print("    Warning: Translation failed, using original content")
             except Exception as e:
@@ -306,8 +316,8 @@ class RSSManager:
     def _save_article(self, article: Article) -> None:
         """Save article to mymind/article directory organized by week as Markdown"""
         try:
-            # Use original title for filename
-            title_for_filename = article.title[:100]
+            # Use translated title for filename if available, otherwise use original title
+            title_for_filename = (article.translated_title or article.title)[:100]
 
             # Create safe filename (keep Chinese characters)
             safe_title = title_for_filename.replace("/", "-").replace("\\", "-")
@@ -357,6 +367,8 @@ class RSSManager:
             md_content.append("## 元数据\n")
             md_content.append(f"- **链接**: {article.link}")
             md_content.append(f"- **作者**: {article.author}")
+            if article.feed_url:
+                md_content.append(f"- **来源**: {article.feed_url}")
 
             # Format published time to Shanghai timezone (UTC+8)
             formatted_published = self._format_published_time(article.published)
