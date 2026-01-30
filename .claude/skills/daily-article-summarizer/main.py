@@ -96,12 +96,52 @@ def main():
             filename = os.path.basename(summary.file_path)
             cache_manager.mark_as_summarized(today, filename, summary)
 
-        # Step 5: Push to Notion
+        # Step 5: Save daily summary to local Markdown
+        print(f"\n📄 Saving daily summary to local Markdown...")
+        summary_dir = os.path.expanduser("~/mymind/daily-summary")
+        os.makedirs(summary_dir, exist_ok=True)
+
+        summary_file = os.path.join(summary_dir, f"{today}_daily_summary.md")
+        all_summaries = new_summaries + list(cached_summaries.values())
+
+        # Group by category
+        by_category = {}
+        for summary in all_summaries:
+            if summary.category not in by_category:
+                by_category[summary.category] = []
+            by_category[summary.category].append(summary)
+
+        with open(summary_file, "w", encoding="utf-8") as f:
+            f.write(f"# 📅 {today[:4]}-{today[4:6]}-{today[6:8]} 每日总结\n\n")
+            f.write(f"**共总结 {len(all_summaries)} 篇文章**\n\n")
+            f.write(f"**生成时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            f.write("---\n\n")
+
+            for category, category_summaries in sorted(by_category.items()):
+                f.write(f"## 📚 {category}\n\n")
+
+                for summary in category_summaries:
+                    score_emoji = "⭐" if summary.score >= 80 else "📖" if summary.score >= 60 else "📄"
+                    f.write(f"### {score_emoji} {summary.title}\n\n")
+                    f.write(f"**评分**: {summary.score}/100\n\n")
+                    f.write(f"**摘要**:\n{summary.summary}\n\n")
+
+                    if summary.key_points:
+                        f.write("**关键要点**:\n")
+                        for point in summary.key_points[:5]:
+                            f.write(f"- {point}\n")
+                        f.write("\n")
+
+                    if summary.source_url:
+                        f.write(f"**链接**: [{summary.source_url}]({summary.source_url})\n\n")
+
+                    f.write("---\n\n")
+
+        print(f"  ✅ Saved to: {summary_file}")
+
+        # Step 6: Push to Notion
         if notion_config.get("sync", False):
             print(f"\n📤 Pushing to Notion...")
-
-            # Combine all summaries
-            all_summaries = new_summaries + list(cached_summaries.values())
 
             notion_manager = NotionSummaryManager(notion_config.get("database_id"))
             page_id = notion_manager.push_daily_summary(today, all_summaries)

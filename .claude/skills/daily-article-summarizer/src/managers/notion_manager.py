@@ -76,8 +76,9 @@ class NotionSummaryManager:
     ) -> List[dict]:
         """Build Notion blocks for daily summary"""
         blocks = []
+        MAX_BLOCKS = 100  # Notion API limit
 
-        # Header
+        # Header (2 blocks)
         formatted_date = f"{date[:4]}-{date[4:6]}-{date[6:8]}"
         blocks.append(
             {
@@ -110,8 +111,12 @@ class NotionSummaryManager:
                 by_category[summary.category] = []
             by_category[summary.category].append(summary)
 
-        # Add summaries by category
+        # Add summaries by category (with block limit check)
         for category, category_summaries in sorted(by_category.items()):
+            # Check if we have space for divider + category heading
+            if len(blocks) + 2 > MAX_BLOCKS:
+                break
+
             blocks.append({"object": "block", "type": "divider", "divider": {}})
             blocks.append(
                 {
@@ -124,6 +129,25 @@ class NotionSummaryManager:
             )
 
             for summary in category_summaries:
+                # Estimate blocks needed for this article
+                # title (1) + summary (1) + key_points (N) + link (1) = 3 + N
+                estimated_blocks = 3 + len(summary.key_points)
+
+                if len(blocks) + estimated_blocks > MAX_BLOCKS:
+                    # Not enough space, add truncation message
+                    blocks.append(
+                        {
+                            "object": "block",
+                            "type": "paragraph",
+                            "paragraph": {
+                                "rich_text": [
+                                    {"type": "text", "text": {"content": f"... (已达到Notion页面限制，还有 {len(category_summaries) - category_summaries.index(summary)} 篇文章未显示)"}}
+                                ]
+                            },
+                        }
+                    )
+                    return blocks
+
                 # Article title with score
                 score_emoji = "⭐" if summary.score >= 80 else "📖" if summary.score >= 60 else "📄"
                 blocks.append(
@@ -151,9 +175,9 @@ class NotionSummaryManager:
                     }
                 )
 
-                # Key points
+                # Key points (limit to 3 to save space)
                 if summary.key_points:
-                    for point in summary.key_points:
+                    for point in summary.key_points[:3]:
                         blocks.append(
                             {
                                 "object": "block",
