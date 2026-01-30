@@ -7,36 +7,8 @@ import requests
 import re
 import os
 from typing import Optional, Dict, List
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, parse_qs, unquote
 from bs4 import BeautifulSoup
-
-
-class FirecrawlExtractor:
-    """Fallback extractor using Firecrawl for JavaScript-rendered pages"""
-
-    def __init__(self):
-        self.api_key = os.getenv("FIRECRAWL_API_KEY")
-        self.enabled = bool(self.api_key)
-
-    def scrape(self, url: str) -> Optional[str]:
-        """Scrape URL using Firecrawl"""
-        if not self.enabled:
-            return None
-        try:
-            from firecrawl import FirecrawlApp
-
-            app = FirecrawlApp(api_key=self.api_key)
-            result = app.scrape_url(url, params={"formats": ["markdown"]})
-
-            if result and "markdown" in result:
-                return result["markdown"]
-            return None
-        except ImportError:
-            print("  Firecrawl not installed, skipping")
-            return None
-        except Exception as e:
-            print(f"  Firecrawl extraction failed: {e}")
-            return None
 
 
 class ContentExtractor:
@@ -46,7 +18,6 @@ class ContentExtractor:
         self.extractor = config.get("extractor", "trafilatura")
         self.include_images = config.get("include_images", True)
         self.max_length = config.get("max_content_length", 50000)
-        self.firecrawl = FirecrawlExtractor()
 
     def extract_content(self, url: str) -> Dict:
         """
@@ -79,23 +50,6 @@ class ContentExtractor:
             # Use BeautifulSoup to extract content with embedded images
             content = self._extract_content_with_images(downloaded, image_list)
 
-            # If content is too short, it might be JavaScript-rendered
-            # Try Firecrawl as fallback
-            if not content or len(content) < 200:
-                print(
-                    f"    Content too short ({len(content) if content else 0} chars), trying Firecrawl..."
-                )
-                markdown_content = self.firecrawl.scrape(url)
-                if markdown_content:
-                    content = markdown_content
-                    print(f"    Firecrawl extraction got {len(content)} chars")
-                    # Extract images from markdown
-                    if self.include_images:
-                        image_list = self._extract_images_from_markdown(
-                            markdown_content
-                        )
-                    result["images"] = image_list
-
             if content:
                 # Truncate if too long
                 if len(content) > self.max_length:
@@ -115,104 +69,121 @@ class ContentExtractor:
 
         return result
 
-    def _extract_images_from_markdown(self, markdown: str) -> List[str]:
-        """Extract image URLs from markdown content"""
-        try:
-            # Match markdown image syntax: ![alt](url)
-            img_pattern = r"!\[.*?\]\(([^)]+)\)"
-            images = re.findall(img_pattern, markdown)
-
-            # Deduplicate and filter
-            unique_images = []
-            seen = set()
-            for img in images:
-                if img not in seen:
-                    seen.add(img)
-                    if img.startswith("http"):
-                        unique_images.append(img)
-
-            return unique_images
-        except Exception as e:
-            print(f"  Markdown image extraction failed: {e}")
-            return []
-
     def _extract_images(self, html: str, base_url: str) -> List[str]:
         """Extract image URLs from HTML using regex, filtering out logos and icons"""
         try:
             base = f"{urlparse(base_url).scheme}://{urlparse(base_url).netloc}"
 
-            # Find all img tags with src attribute
-            img_pattern = r'<img[^>]+src=[\'"]([^\'">]+)[\'"]'
-            images = re.findall(img_pattern, html)
+            # Find all img tags with src and srcset attributes
+            src_pattern = r'<img[^>]+src=[\'"]([^\'">]+)[\'"]'
+            srcset_pattern = r'<img[^>]+srcset=[\'"]([^\'">]+)[\'"]'
+            src_images = re.findall(src_pattern, html)
+            srcset_images = re.findall(srcset_pattern, html)
+
+            # Merge src and srcset images
+            all_img_attrs = src_images + srcset_images
 
             # Convert to absolute URLs and deduplicate
             unique_images = set()
-            for img in images:
-                # Skip tracking pixels, analytics, and non-content images
-                skip_patterns = [
-                    "adsct",
-                    "analytics",
-                    "pixel",
-                    "facebook.com/tr",
-                    "twitter.com/i",
-                ]
-                if any(x in img for x in skip_patterns):
-                    continue
-                if img.endswith(".gif") or "icon" in img.lower():
-                    continue
+            for img in all_img_attrs:
+                if "," in img:
+                    img_urls = []
+                    for part in img.split(","):
+                        part = part.strip().split()[0]
+                        img_urls.append(part)
 
-                # Skip logos and branding images
-                logo_patterns = [
-                    "logo",
-                    "brand",
-                    "header-logo",
-                    "site-logo",
-                    "footer-logo",
-                    "favicon",
-                    "apple-touch-icon",
-                    "icon",
-                    "branding",
-                    "site-header",
-                    "site-footer",
-                    "company-logo",
-                    "header-brand",
-                    "social-share",
-                    "og:image",
-                ]
-                img_lower = img.lower()
-                if any(pattern in img_lower for pattern in logo_patterns):
+                    for img_url in img_urls:
+                        if self._should_include_image(img_url):
+                            abs_url = self._resolve_image_url(img_url, base)
+                            if abs_url:
+                                unique_images.add(abs_url)
                     continue
 
-                # Skip small avatars/icons (check for size in URL like w_32, h_80, etc.)
-                # Typical small sizes: w_32, w_36, w_80, h_32, h_36, h_80, w_64, h_64
-                small_size_patterns = [
-                    "w_32",
-                    "w_36",
-                    "w_64",
-                    "w_80",
-                    "h_32",
-                    "h_36",
-                    "h_64",
-                    "h_80",
-                ]
-                if any(x in img for x in small_size_patterns):
+                img_url = img
+                if not self._should_include_image(img_url):
                     continue
 
-                # Skip placeholder images
-                if "placeholder" in img_lower:
-                    continue
+                abs_url = self._resolve_image_url(img_url, base)
+                if abs_url:
+                    unique_images.add(abs_url)
 
-                if img.startswith("http"):
-                    unique_images.add(img)
-                elif img.startswith("//"):
-                    unique_images.add(f"https:{img}")
-                else:
-                    unique_images.add(urljoin(base, img))
-
-            return list(unique_images)  # Return all content images
+            return list(unique_images)
         except Exception as e:
             print(f"  Image extraction failed: {e}")
             return []
+
+    def _should_include_image(self, img_url: str) -> bool:
+        skip_patterns = [
+            "adsct",
+            "analytics",
+            "pixel",
+            "facebook.com/tr",
+            "twitter.com/i",
+        ]
+        if any(x in img_url for x in skip_patterns):
+            return False
+        if img_url.endswith(".gif") or "icon" in img_url.lower():
+            return False
+
+        logo_patterns = [
+            "logo",
+            "brand",
+            "header-logo",
+            "site-logo",
+            "footer-logo",
+            "favicon",
+            "apple-touch-icon",
+            "icon",
+            "branding",
+            "site-header",
+            "site-footer",
+            "company-logo",
+            "header-brand",
+            "social-share",
+            "og:image",
+        ]
+        img_lower = img_url.lower()
+        if any(pattern in img_lower for pattern in logo_patterns):
+            return False
+
+        small_size_patterns = [
+            "w_32",
+            "w_36",
+            "w_64",
+            "w_80",
+            "h_32",
+            "h_36",
+            "h_64",
+            "h_80",
+        ]
+        if any(x in img_url for x in small_size_patterns):
+            return False
+
+        if "placeholder" in img_lower:
+            return False
+
+        return True
+
+    def _resolve_image_url(self, img_url: str, base: str) -> Optional[str]:
+        try:
+            parsed = urlparse(img_url)
+
+            if "url=" in img_url:
+                qs = parse_qs(parsed.query)
+                if "url" in qs:
+                    real_url = unquote(qs["url"][0])
+                    if real_url.startswith("http"):
+                        return real_url
+
+            if img_url.startswith("http"):
+                return img_url
+            elif img_url.startswith("//"):
+                return f"https:{img_url}"
+            else:
+                return urljoin(base, img_url)
+        except Exception as e:
+            print(f"  Failed to resolve image URL {img_url}: {e}")
+            return None
 
     def clean_content(self, content: str) -> str:
         """Clean and format extracted content"""
@@ -352,6 +323,8 @@ class ContentExtractor:
                                 "post",
                                 "body",
                                 "main",
+                                "media",
+                                "image",
                             ]
                         )
 

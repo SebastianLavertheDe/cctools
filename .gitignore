@@ -33,3 +33,6 @@ settings.local.json**/output/
 **/workflows/article_cache.json
 .claude/skills/x-following-fetcher/x_curl.txt
 airss/.env
+
+# Local article storage
+mymind/
