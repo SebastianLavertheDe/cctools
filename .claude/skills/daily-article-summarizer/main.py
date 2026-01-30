@@ -98,7 +98,12 @@ def main():
 
         # Step 5: Save daily summary to local Markdown
         print(f"\n📄 Saving daily summary to local Markdown...")
-        summary_dir = os.path.expanduser("~/mymind/daily-summary")
+
+        # Save to project root ./mymind/daily-summary directory
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        # Go up three levels: skill -> skills -> .claude -> project root
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(script_dir)))
+        summary_dir = os.path.join(project_root, "mymind", "daily-summary")
         os.makedirs(summary_dir, exist_ok=True)
 
         summary_file = os.path.join(summary_dir, f"{today}_daily_summary.md")
