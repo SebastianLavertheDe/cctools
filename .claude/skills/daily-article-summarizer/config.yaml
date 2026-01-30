@@ -1,0 +1,17 @@
+# Article source directory
+article_directory: "/home/say/work/github/cctools/mymind/article"
+
+# AI settings
+ai:
+  provider: nvidia
+  model: minimaxai/minimax-m2.1
+  max_articles_per_day: 20
+  batch_size: 5
+
+# Notion settings
+notion:
+  sync: true
+  database_id: "2d83c1497bd580b7824de65c408b11f8"
+
+# Cache file
+cache_file: "summary_cache.json"
