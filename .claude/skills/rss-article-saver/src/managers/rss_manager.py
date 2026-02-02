@@ -5,6 +5,7 @@ RSS Manager - Main processing workflow for multiple RSS feeds
 import feedparser
 import os
 import json
+import time
 from pathlib import Path
 from datetime import datetime
 from ..core.models import Article
@@ -12,6 +13,33 @@ from ..managers.opml_parser import RSSFeed
 from ..managers.cache_manager import ArticleCacheManager
 from ..managers.content_manager import ContentExtractor
 from ..notion.notion_manager import BlogNotionManager
+
+
+def is_mostly_english(text: str, threshold: float = 0.3) -> bool:
+    """
+    Check if text is mostly English (for detecting failed translations)
+
+    Args:
+        text: Text to check
+        threshold: Ratio of non-ASCII chars to consider text translated (default 0.3 = 30%)
+
+    Returns:
+        True if text is mostly English (needs translation), False if likely translated
+    """
+    if not text or len(text.strip()) < 10:
+        return True  # Treat very short text as English
+
+    # Count Chinese characters (CJK Unified Ideographs)
+    chinese_chars = sum(1 for c in text if '\u4e00' <= c <= '\u9fff')
+
+    # Count total characters (excluding whitespace)
+    total_chars = sum(1 for c in text if not c.isspace())
+
+    if total_chars == 0:
+        return True
+
+    chinese_ratio = chinese_chars / total_chars
+    return chinese_ratio < threshold  # True if less than 30% Chinese chars
 
 
 class RSSManager:
@@ -70,19 +98,15 @@ class RSSManager:
             translation_config = config.get_translation_settings()
             self.translation_enabled = translation_config.get("enabled", False)
             if self.translation_enabled:
-                translation_provider = translation_config.get(
-                    "provider", "nvidia"
-                ).lower()
-                if translation_provider == "nvidia":
-                    from ..ai.nvidia_client import NVIDIATranslator
+                from ..ai.translation_client import FallbackTranslator
 
-                    self.translator = NVIDIATranslator()
-                    print(f"Translation enabled (NVIDIA minimax)")
-                else:
-                    self.translator = None
-                    print(
-                        f"Translation provider '{translation_provider}' not supported"
-                    )
+                # Use fallback translator (NVIDIA -> Google Gemini)
+                primary = translation_config.get("provider", "nvidia").lower()
+                fallback = translation_config.get("fallback_provider", "google").lower()
+                self.translator = FallbackTranslator(
+                    primary_provider=primary,
+                    fallback_provider=fallback
+                )
             else:
                 self.translator = None
         except Exception as e:
@@ -92,6 +116,10 @@ class RSSManager:
             traceback.print_exc()
             self.translator = None
             self.translation_enabled = False
+
+        # Article counter for numbering
+        self.article_counter = 0
+        self.current_date = None
 
     def fetch_feed(self, feed: RSSFeed):
         """Fetch a single RSS feed"""
@@ -288,15 +316,40 @@ class RSSManager:
                         article.translated_title = translated_title
                         print(f"    Title translated: {translated_title}")
 
-                # Translate content
-                translated_content = self.translator.translate_to_chinese(
-                    article.full_content
-                )
-                if translated_content:
-                    article.full_content = translated_content
-                    print("    Content translation completed")
-                else:
-                    print("    Warning: Translation failed, using original content")
+                # Translate content with retry and detection
+                translation_success = False
+                max_attempts = 2
+
+                for attempt in range(max_attempts):
+                    translated_content = self.translator.translate_to_chinese(
+                        article.full_content,
+                        max_retries=3
+                    )
+
+                    if translated_content:
+                        # Check if translation actually worked (content is no longer mostly English)
+                        if not is_mostly_english(translated_content):
+                            article.full_content = translated_content
+                            print("    Content translation completed")
+                            translation_success = True
+                            break
+                        else:
+                            print(f"    Warning: Translation result still mostly English (attempt {attempt + 1}/{max_attempts})")
+                            if attempt < max_attempts - 1:
+                                print("    Waiting 3 seconds before retry...")
+                                time.sleep(3)
+                    else:
+                        print(f"    Warning: Translation returned None (attempt {attempt + 1}/{max_attempts})")
+                        if attempt < max_attempts - 1:
+                            print("    Waiting 3 seconds before retry...")
+                            time.sleep(3)
+
+                if not translation_success:
+                    print("    Warning: Translation failed after all attempts, using original content")
+
+                # Add delay between articles to avoid rate limits
+                time.sleep(2)
+
             except Exception as e:
                 print(f"    Warning: Translation error: {e}, using original content")
 
@@ -316,6 +369,18 @@ class RSSManager:
     def _save_article(self, article: Article) -> None:
         """Save article to mymind/article directory organized by week as Markdown"""
         try:
+            # Get current date
+            now = datetime.now()
+            current_date_str = f"{now.year}{now.month:02d}{now.day:02d}"
+
+            # Reset counter if date changed
+            if self.current_date != current_date_str:
+                self.current_date = current_date_str
+                self.article_counter = 0
+
+            # Increment counter
+            self.article_counter += 1
+
             # Use translated title for filename if available, otherwise use original title
             title_for_filename = (article.translated_title or article.title)[:100]
 
@@ -336,12 +401,11 @@ class RSSManager:
                 for c in safe_title
             )
 
-            # Use title as filename (without timestamp)
-            filename = f"{safe_title}.md"
+            # Use title as filename with number prefix
+            filename = f"{self.article_counter}_{safe_title}.md"
 
             # Get date directory (format: YYYYMMDD)
             # Determine base directory based on feed type
-            now = datetime.now()
             year, month, day = now.year, now.month, now.day
             date_dir_name = f"{year}{month:02d}{day:02d}"
 
@@ -360,8 +424,9 @@ class RSSManager:
             # Build Markdown content
             md_content = []
 
-            # Title
-            md_content.append(f"# {article.title}\n")
+            # Title - use translated title if available
+            title_to_use = article.translated_title if article.translated_title else article.title
+            md_content.append(f"# {title_to_use}\n")
 
             # Metadata
             md_content.append("## 元数据\n")

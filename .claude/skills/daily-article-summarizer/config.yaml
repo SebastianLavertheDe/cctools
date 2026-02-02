@@ -4,7 +4,9 @@ article_directory: "/home/say/work/github/cctools/mymind/article"
 # AI settings
 ai:
   provider: nvidia
+  fallback_provider: google
   model: minimaxai/minimax-m2.1
+  fallback_model: gemini-2.5-flash
   max_articles_per_day: 20
   batch_size: 5
 

@@ -8,6 +8,7 @@ import time
 import requests
 import re
 import html
+import json
 from typing import Optional
 from bs4 import BeautifulSoup
 
@@ -23,7 +24,64 @@ class NVIDIATranslator:
         if not self.api_key or not self.api_key.strip():
             raise ValueError("NVIDIA_API_KEY 未设置或为空")
 
-    def _clean_html_tags(self, text: str) -> str:
+    def _extract_json_translation(self, content: str) -> Optional[str]:
+        """
+        Extract translation from JSON response, handling AI thinking process
+
+        Args:
+            content: Raw response from AI
+
+        Returns:
+            Extracted translation or None
+        """
+        if not content:
+            return None
+
+        # First, try to find JSON object at the end (after any thinking process)
+        # Split by common thinking process markers
+        lines = content.split('\n')
+
+        # Find where JSON likely starts (look for "{")
+        json_start_idx = -1
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            # Skip thinking process patterns
+            if stripped.startswith("The user wants") or stripped.startswith("Let me") or \
+               stripped.startswith("I need to") or stripped.startswith("Looking at"):
+                continue
+            # Look for JSON start
+            if '{' in stripped:
+                json_start_idx = i
+                break
+
+        if json_start_idx >= 0:
+            # Extract from JSON start to end
+            json_content = '\n'.join(lines[json_start_idx:])
+
+            # Try to find the JSON object
+            try:
+                # Find the first { and last }
+                start = json_content.find('{')
+                end = json_content.rfind('}') + 1
+                if start >= 0 and end > start:
+                    json_str = json_content[start:end]
+                    result = json.loads(json_str)
+                    translation = result.get('translation')
+                    if translation:
+                        return translation
+            except json.JSONDecodeError:
+                pass  # Try alternative methods
+
+        # Fallback: try to extract JSON using regex
+        json_match = re.search(r'\{[^{}]*"translation"\s*:\s*"[^"]*"[^{}]*\}', content)
+        if json_match:
+            try:
+                result = json.loads(json_match.group(0))
+                return result.get('translation')
+            except json.JSONDecodeError:
+                pass
+
+        return None
         """清理文本中的 HTML 标签"""
         try:
             # 使用 BeautifulSoup 清理 HTML
@@ -61,17 +119,18 @@ class NVIDIATranslator:
             "Content-Type": "application/json",
         }
 
-        # Use regular string concatenation to avoid f-string brace issues
-        prompt = "You are a professional translator. Translate the following title to Chinese.\n\n"
-        prompt += f"Original title: {title}\n\n"
-        prompt += """Output format (JSON):
-{"translation": "translated_title"}
+        # JSON format prompt for cleaner output
+        prompt = f"""Translate the following title to Chinese.
+
+Original title: {title}
+
+Output format (JSON only):
+{{"translation": "translated_title_here"}}
 
 Rules:
 - Return ONLY the JSON object
-- Do NOT include any explanations
-- Do NOT include thinking process
-- Start your response directly with the JSON"""
+- Do NOT include any explanations or thinking process
+- Keep it concise and accurate"""
 
         payload = {
             "messages": [{"role": "user", "content": prompt}],
@@ -96,38 +155,10 @@ Rules:
                         .strip()
                     )
 
-                    # Try to parse as JSON
-                    import json
-                    try:
-                        # Find JSON in the content
-                        if '{' in content:
-                            start = content.find('{')
-                            end = content.rfind('}') + 1
-                            json_str = content[start:end]
-                            result = json.loads(json_str)
-                            if 'translation' in result:
-                                return result['translation'].strip()
-                    except:
-                        pass
-
-                    # Fallback: extract Chinese text more aggressively
-                    # Split by common delimiters and find the cleanest Chinese phrase
-                    import re
-                    # Try to find Chinese phrases
-                    chinese_matches = re.findall(r'[\u4e00-\u9fff]+[：:\s,，]*[\u4e00-\u9fff\s]*', content)
-                    if chinese_matches:
-                        # Return the longest match (likely the complete translation)
-                        return max(chinese_matches, key=len).strip()
-
-                    # Last resort: just find any Chinese text
-                    lines = content.split('\n')
-                    for line in lines:
-                        line = line.strip()
-                        if any('\u4e00' <= char <= '\u9fff' for char in line):
-                            # Extract just the Chinese part
-                            chinese_part = ''.join(c for c in line if '\u4e00' <= c <= '\u9fff' or c in '：，。、！？；：""''（）【】《》')
-                            if chinese_part and len(chinese_part) > 2:
-                                return chinese_part.strip()
+                    # Parse JSON response using helper function
+                    translation = self._extract_json_translation(content)
+                    if translation:
+                        return translation
 
             except Exception as e:
                 if attempt < 2:
@@ -137,7 +168,7 @@ Rules:
 
     def translate_to_chinese(self, text: str, max_retries: int = 3) -> Optional[str]:
         """
-        将文本翻译成中文（一次性翻译，不切割）
+        将文本翻译成中文
 
         Args:
             text: 要翻译的文本
@@ -149,8 +180,77 @@ Rules:
         if not text or len(text.strip()) < 1:
             return text
 
-        # Translate the entire text at once
-        return self._translate_chunk(text, max_retries)
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+
+        # JSON format prompt for cleaner output
+        prompt = f"""Translate the following text to Chinese.
+
+Text:
+{text}
+
+Output format (JSON only):
+{{"translation": "translated_text_here"}}
+
+Rules:
+- Return ONLY the JSON object
+- Do NOT include any explanations or thinking process
+- Keep Markdown format
+- Do not translate code blocks or URLs
+- Keep technical terms accurate"""
+
+        payload = {
+            "messages": [{"role": "user", "content": prompt}],
+            "model": self.model,
+            "stream": False,
+            "temperature": 0.3,
+        }
+
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    self.base_url, headers=headers, json=payload, timeout=60
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    content = (
+                        data.get("choices", [{}])[0]
+                        .get("message", {})
+                        .get("content", "")
+                        .strip()
+                    )
+
+                    # Parse JSON response using helper function
+                    translation = self._extract_json_translation(content)
+                    if translation:
+                        return translation
+
+                else:
+                    print(
+                        f"    Warning: Translation failed (status {response.status_code}), attempt {attempt + 1}/{max_retries}"
+                    )
+                    if attempt < max_retries - 1:
+                        time.sleep(2**attempt)
+
+            except requests.exceptions.Timeout:
+                print(
+                    f"    Warning: Translation timeout, attempt {attempt + 1}/{max_retries}"
+                )
+                if attempt < max_retries - 1:
+                    time.sleep(2**attempt)
+            except Exception as e:
+                print(
+                    f"    Warning: Translation error: {e}, attempt {attempt + 1}/{max_retries}"
+                )
+                if attempt < max_retries - 1:
+                    time.sleep(2**attempt)
+
+        print(f"    Error: Translation failed after {max_retries} attempts")
+        return None
 
     def _translate_chunk(self, text: str, max_retries: int) -> Optional[str]:
         """

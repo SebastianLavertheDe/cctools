@@ -6,9 +6,78 @@ Google Gemini AI 客户端
 import os
 import json
 import time
-from typing import Dict, List, Optional, Tuple
-import google.generativeai as genai
+from typing import Dict, Optional, Tuple
+from google import genai
+from google.genai import types
 import re
+
+
+def extract_json_translation(content: str) -> Optional[str]:
+    """
+    Extract translation from JSON response, handling AI thinking process
+
+    Args:
+        content: Raw response from AI
+
+    Returns:
+        Extracted translation or None
+    """
+    if not content:
+        return None
+
+    # Remove common prompt artifacts that may appear in the response
+    artifacts_to_remove = [
+        '输出格式（仅JSON）：',
+        'Output format (JSON only):',
+        '规则：',
+        'Rules:',
+        '- 仅返回JSON对象',
+        '- Return ONLY the JSON object',
+        '- 不包括任何解释或思考过程',
+        '- Do NOT include any explanations or thinking process',
+        '- 保持Markdown格式',
+        '- Keep Markdown format',
+        '- 不翻译代码块或URL',
+        '- Do not translate code blocks or URLs',
+        '- 保持技术术语准确',
+        '- Keep technical terms accurate',
+        '{"translation": "translated_text_here"}',
+    ]
+
+    cleaned_content = content
+    for artifact in artifacts_to_remove:
+        cleaned_content = cleaned_content.replace(artifact, '')
+
+    # Try to find JSON object
+    try:
+        # Find the first { and last }
+        start = cleaned_content.find('{')
+        if start >= 0:
+            # Find matching closing brace
+            brace_count = 0
+            end = -1
+            for i in range(start, len(cleaned_content)):
+                if cleaned_content[i] == '{':
+                    brace_count += 1
+                elif cleaned_content[i] == '}':
+                    brace_count -= 1
+                    if brace_count == 0:
+                        end = i + 1
+                        break
+
+            if end > start:
+                json_str = cleaned_content[start:end]
+                result = json.loads(json_str)
+                translation = result.get('translation')
+                if translation:
+                    # Clean up any remaining artifacts from the translation
+                    for artifact in artifacts_to_remove:
+                        translation = translation.replace(artifact, '')
+                    return translation.strip()
+    except (json.JSONDecodeError, ValueError):
+        pass
+
+    return None
 
 
 def extract_json_from_response(response: str) -> str:
@@ -18,20 +87,20 @@ def extract_json_from_response(response: str) -> str:
     """
     if not response:
         return response
-    
+
     text = response.strip()
-    
+
     # 尝试用正则提取 ```json ... ``` 或 ``` ... ``` 中的内容（完整的代码块）
     patterns = [
         r'```json\s*([\s\S]*?)\s*```',  # ```json ... ```
         r'```\s*([\s\S]*?)\s*```',       # ``` ... ```
     ]
-    
+
     for pattern in patterns:
         match = re.search(pattern, text)
         if match:
             return match.group(1).strip()
-    
+
     # 如果没有匹配到完整的代码块，可能是被截断了
     # 尝试提取 ```json 或 ``` 之后的所有内容
     if '```json' in text:
@@ -40,17 +109,120 @@ def extract_json_from_response(response: str) -> str:
         text = text[idx + 7:].strip()
     elif text.startswith('```'):
         text = text[3:].strip()
-    
+
     # 去除可能存在的结尾 ```
     if text.endswith('```'):
         text = text[:-3].strip()
-    
+
     # 尝试找到 JSON 对象的开始（第一个 {）
     if '{' in text:
         idx = text.find('{')
         text = text[idx:]
-    
+
     return text.strip()
+
+
+class GeminiTranslator:
+    """Google Gemini 翻译客户端"""
+
+    def __init__(self):
+        self.api_key = os.getenv('GEMINI_API_KEY')
+        self.model_name = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')
+
+        if not self.api_key or not self.api_key.strip():
+            raise ValueError("GEMINI_API_KEY 未设置或为空")
+
+        # 初始化 Gemini client
+        self.client = genai.Client(api_key=self.api_key)
+
+    def translate_title(self, title: str) -> Optional[str]:
+        """翻译标题到中文"""
+        if not title or len(title.strip()) < 1:
+            return title
+
+        prompt = f"""Translate the following title to Chinese.
+
+Original title: {title}
+
+Output format (JSON only):
+{{"translation": "translated_title_here"}}
+
+Rules:
+- Return ONLY the JSON object
+- Do NOT include any explanations or thinking process
+- Keep it concise and accurate"""
+
+        return self._translate_with_prompt(prompt, is_json=True)
+
+    def translate_to_chinese(self, text: str, max_retries: int = 3) -> Optional[str]:
+        """翻译文本到中文"""
+        if not text or len(text.strip()) < 1:
+            return text
+
+        prompt = f"""Translate the following text to Chinese.
+
+{text}
+
+IMPORTANT: Return ONLY a JSON object in this exact format: {{"translation": "your translated text here"}}
+Do NOT include any explanations, instructions, or additional text."""
+
+        return self._translate_with_prompt(prompt, is_json=True, max_retries=max_retries)
+
+    def _translate_with_prompt(self, prompt: str, is_json: bool = False, max_retries: int = 5) -> Optional[str]:
+        """使用给定提示词进行翻译"""
+        for attempt in range(max_retries):
+            try:
+                response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        max_output_tokens=32768,
+                        temperature=0.3,
+                    )
+                )
+
+                if not response or not hasattr(response, 'text') or not response.text:
+                    print(f"    Warning: Empty response from Gemini, attempt {attempt + 1}/{max_retries}")
+                    if attempt < max_retries - 1:
+                        time.sleep(2**attempt)
+                    continue
+
+                content = response.text.strip()
+
+                # Parse JSON if needed
+                if is_json:
+                    translation = extract_json_translation(content)
+                    if translation:
+                        return translation
+                    else:
+                        print(f"    Warning: Failed to extract translation from JSON, attempt {attempt + 1}/{max_retries}")
+                        # Fallback: try to use content as-is
+                        if attempt < max_retries - 1:
+                            time.sleep(2**attempt)
+                            continue
+                        return content
+                else:
+                    return content
+
+            except Exception as e:
+                error_str = str(e)
+                # Check if it's a rate limit error (429)
+                if '429' in error_str or 'quota' in error_str.lower() or 'RESOURCE_EXHAUSTED' in error_str:
+                    print(f"    Warning: Gemini API rate limit hit, attempt {attempt + 1}/{max_retries}")
+                    # For rate limit errors, wait longer before retry
+                    if attempt < max_retries - 1:
+                        wait_time = (attempt + 2) * 10  # 10s, 20s, 30s, 40s, 50s
+                        print(f"    Waiting {wait_time}s before retry...")
+                        time.sleep(wait_time)
+                else:
+                    print(f"    Warning: Gemini API error: {e}, attempt {attempt + 1}/{max_retries}")
+
+                if attempt < max_retries - 1:
+                    if '429' not in str(e):
+                        time.sleep(2**attempt)
+
+        print(f"    Error: Gemini translation failed after {max_retries} attempts")
+        return None
 
 
 class GeminiClient:
@@ -63,9 +235,8 @@ class GeminiClient:
         if not self.api_key or not self.api_key.strip():
             raise ValueError("GEMINI_API_KEY 未设置或为空")
 
-        # 初始化 Gemini
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel(self.model_name)
+        # 初始化 Gemini client
+        self.client = genai.Client(api_key=self.api_key)
 
     def _make_request(self, prompt: str, max_tokens: int = 1000, max_retries: int = 3) -> Optional[str]:
         """
@@ -79,19 +250,20 @@ class GeminiClient:
         Returns:
             API响应内容，失败时返回None
         """
-        import time as time_module
-        
         for attempt in range(max_retries):
             try:
-                response = self.model.generate_content(
-                    prompt,
-                    generation_config=genai.types.GenerationConfig(
+                response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
                         max_output_tokens=max_tokens,
                         temperature=0.3,
                     )
                 )
 
-                return response.text.strip()
+                if response and hasattr(response, 'text') and response.text:
+                    return response.text.strip()
+                return None
 
             except Exception as e:
                 error_str = str(e)
@@ -99,22 +271,21 @@ class GeminiClient:
                 if '429' in error_str or 'quota' in error_str.lower():
                     wait_time = (attempt + 1) * 30  # 30s, 60s, 90s
                     print(f"  Rate limit hit, waiting {wait_time}s before retry ({attempt + 1}/{max_retries})...")
-                    time_module.sleep(wait_time)
+                    time.sleep(wait_time)
                     continue
                 else:
                     print(f"Gemini API 请求失败: {e}")
                     return None
-        
+
         print(f"Gemini API 请求失败: 重试 {max_retries} 次后仍然失败")
         return None
 
-    def summarize_text(self, text: str, max_length: int = 200) -> Optional[str]:
+    def summarize_text(self, text: str) -> Optional[str]:
         """
         文本深度分析（使用详细的分析框架）
 
         Args:
             text: 要分析的文本
-            max_length: 最大长度（此处忽略，使用详细分析）
 
         Returns:
             分析结果，失败时返回None
