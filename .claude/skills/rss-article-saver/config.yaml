@@ -26,6 +26,6 @@ ai:
 notion:
   sync: false  # 设置为 true 启用 Notion 推送
 translation:
-  enabled: true  # 启用翻译
+  enabled: false  # 启用翻译
   provider: nvidia
   model: minimaxai/minimax-m2.1

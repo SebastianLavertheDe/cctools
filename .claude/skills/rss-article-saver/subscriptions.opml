@@ -6,5 +6,6 @@
     <body>
         <outline text="Blog RSS" title="Blog RSS" type="blog" xmlUrl="https://raw.githubusercontent.com/SebastianLavertheDe/blog-rss-feed/main/blog_rss.xml" />
         <!-- <outline text="Post RSS" title="Post RSS" type="post" xmlUrl="https://raw.githubusercontent.com/SebastianLavertheDe/blog-rss-feed/main/post_rss.xml" category="post" /> -->
+        <outline text="Hack News Popular Blogs 2025" title="Hack News Popular Blogs 2025" xmlUrl="https://gist.githubusercontent.com/emschwartz/e6d2bf860ccc367fe37ff953ba6de66b/raw/hn-popular-blogs-2025.opml" />
     </body>
 </opml>
