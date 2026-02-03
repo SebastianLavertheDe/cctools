@@ -36,5 +36,6 @@ airss/.env
 
 # Local article storage
 mymind/article/
-mymind/post/# Workflow logs
+mymind/post/
+mymind/daily-summary/
 **/skills/**/logs/
