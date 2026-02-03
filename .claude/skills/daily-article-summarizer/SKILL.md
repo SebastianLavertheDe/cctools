@@ -23,10 +23,6 @@ cd /home/say/work/github/cctools/.claude/skills/daily-article-summarizer
 # Install dependencies
 uv sync
 
-# Setup environment
-cp .env.example .env
-# Edit .env with your API keys
-
 # Run the summarizer
 uv run --env-file .env python main.py
 ```
