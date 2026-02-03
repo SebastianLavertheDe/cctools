@@ -6,6 +6,8 @@ import trafilatura
 import requests
 import re
 import os
+import json
+import html as html_lib
 from typing import Optional, Dict, List
 from urllib.parse import urljoin, urlparse, parse_qs, unquote
 from bs4 import BeautifulSoup
@@ -50,6 +52,21 @@ class ContentExtractor:
             # Use BeautifulSoup to extract content with embedded images
             content = self._extract_content_with_images(downloaded, image_list)
 
+            # If content is too short, try structured data fallbacks (Next.js / ld+json)
+            if not content or len(content.strip()) < 200:
+                ld_json_content = self._extract_from_ld_json(downloaded)
+                next_data_content = self._extract_from_next_data(downloaded)
+
+                # Prefer the longest meaningful content
+                candidates = [content or "", ld_json_content or "", next_data_content or ""]
+                content = max(candidates, key=lambda c: len(c.strip()))
+
+            # Last fallback: trafilatura text extraction
+            if not content or len(content.strip()) < 200:
+                traf_content = trafilatura.extract(downloaded) or ""
+                if len(traf_content.strip()) > len((content or "").strip()):
+                    content = traf_content
+
             if content:
                 # Truncate if too long
                 if len(content) > self.max_length:
@@ -68,6 +85,210 @@ class ContentExtractor:
             print(f"  Content extraction failed: {e}")
 
         return result
+
+    def _extract_from_ld_json(self, html: str) -> str:
+        """Extract articleBody from JSON-LD if available"""
+        try:
+            soup = BeautifulSoup(html, "html.parser")
+            scripts = soup.find_all("script", type="application/ld+json")
+            candidates = []
+
+            for script in scripts:
+                raw = script.string or script.get_text()
+                if not raw:
+                    continue
+                try:
+                    data = json.loads(raw)
+                except Exception:
+                    continue
+
+                self._collect_ldjson_candidates(data, candidates)
+
+            return self._choose_best_candidate(candidates)
+        except Exception:
+            return ""
+
+    def _collect_ldjson_candidates(self, data, candidates: List[str]) -> None:
+        if isinstance(data, dict):
+            # Prefer explicit article body fields
+            for key in ["articleBody", "content", "body", "text"]:
+                value = data.get(key)
+                if isinstance(value, str):
+                    candidates.append(self._normalize_candidate_text(value))
+
+            # Handle graph structures
+            for value in data.values():
+                self._collect_ldjson_candidates(value, candidates)
+
+        elif isinstance(data, list):
+            for item in data:
+                self._collect_ldjson_candidates(item, candidates)
+
+    def _extract_from_next_data(self, html: str) -> str:
+        """Extract content from Next.js __NEXT_DATA__ if available"""
+        try:
+            soup = BeautifulSoup(html, "html.parser")
+            script = soup.find("script", id="__NEXT_DATA__")
+            if not script:
+                return ""
+
+            raw = script.string or script.get_text()
+            if not raw:
+                return ""
+
+            data = json.loads(raw)
+            candidates = []
+            self._collect_next_data_candidates(data, candidates)
+            return self._choose_best_candidate(candidates)
+        except Exception:
+            return ""
+
+    def _collect_next_data_candidates(self, data, candidates: List[str]) -> None:
+        preferred_keys = {
+            "content",
+            "body",
+            "articleBody",
+            "markdown",
+            "mdx",
+            "mdxSource",
+            "html",
+            "text",
+            "description",
+            "summary",
+        }
+
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if isinstance(value, str) and key in preferred_keys:
+                    candidates.append(self._normalize_candidate_text(value))
+                elif isinstance(value, list) and key in {"content", "body", "blocks", "sections"}:
+                    block_text = self._join_text_from_blocks(value)
+                    if block_text:
+                        candidates.append(block_text)
+                else:
+                    self._collect_next_data_candidates(value, candidates)
+        elif isinstance(data, list):
+            for item in data:
+                self._collect_next_data_candidates(item, candidates)
+
+    def _join_text_from_blocks(self, blocks: List) -> str:
+        lines = []
+
+        def add_line(text: str, prefix: str = ""):
+            text = text.strip()
+            if text:
+                lines.append(f"{prefix}{text}")
+
+        def walk(block):
+            if isinstance(block, str):
+                add_line(block)
+                return
+            if isinstance(block, dict):
+                block_type = str(block.get("type", "")).lower()
+                for key in ["title", "heading", "subtitle", "text", "content"]:
+                    value = block.get(key)
+                    if isinstance(value, str):
+                        if key in {"title", "heading"} or block_type in {"heading", "title", "h2", "h3"}:
+                            add_line(value, "## ")
+                        else:
+                            add_line(value)
+                # Recurse into children
+                for child_key in ["children", "items", "blocks", "content"]:
+                    child = block.get(child_key)
+                    if isinstance(child, list):
+                        for item in child:
+                            walk(item)
+            elif isinstance(block, list):
+                for item in block:
+                    walk(item)
+
+        for block in blocks:
+            walk(block)
+
+        return "\n".join(lines).strip()
+
+    def _normalize_candidate_text(self, text: str) -> str:
+        text = html_lib.unescape(text).strip()
+        if not text:
+            return ""
+        if "<" in text and ">" in text:
+            return self._html_to_markdown(text)
+        return text
+
+    def _choose_best_candidate(self, candidates: List[str]) -> str:
+        best = ""
+        best_score = 0
+
+        for candidate in candidates:
+            if not candidate:
+                continue
+            cleaned = candidate.strip()
+            if len(cleaned) < 200:
+                continue
+            if self._looks_like_code_or_blob(cleaned):
+                continue
+
+            score = len(cleaned)
+            if cleaned.count("\n") > 5:
+                score *= 1.1
+            if cleaned.count(".") + cleaned.count("。") > 5:
+                score *= 1.1
+
+            if score > best_score:
+                best_score = score
+                best = cleaned
+
+        return best
+
+    def _looks_like_code_or_blob(self, text: str) -> bool:
+        if "function(" in text or "webpack" in text or "__NEXT_DATA__" in text:
+            return True
+        if text.count("{") > 20 and text.count("}") > 20:
+            return True
+        if text.count("<") > 20 and text.count(">") > 20 and "<p" not in text:
+            return True
+        return False
+
+    def _html_to_markdown(self, html: str) -> str:
+        """Convert HTML content to simple markdown-like text"""
+        try:
+            soup = BeautifulSoup(html, "html.parser")
+
+            for tag in soup.find_all(["script", "style", "nav", "footer", "header", "aside", "noscript"]):
+                tag.decompose()
+
+            # Headings
+            for tag in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"]):
+                level = int(tag.name[1])
+                prefix = "#" * level
+                tag.replace_with(f"\n\n{prefix} {tag.get_text(strip=True)}\n\n")
+
+            # Lists
+            for tag in soup.find_all("li"):
+                tag.replace_with(f"\n- {tag.get_text(strip=True)}\n")
+
+            # Paragraphs
+            for tag in soup.find_all("p"):
+                text = tag.get_text(strip=True)
+                if text:
+                    tag.replace_with(f"\n{text}\n")
+                else:
+                    tag.decompose()
+
+            # Images
+            for tag in soup.find_all("img"):
+                src = tag.get("src", "")
+                alt = tag.get("alt", "")
+                if src:
+                    tag.replace_with(f"\n\n![{alt}]({src})\n\n")
+                else:
+                    tag.decompose()
+
+            text = soup.get_text(separator="\n", strip=True)
+            text = re.sub(r"\n{3,}", "\n\n", text)
+            return text.strip()
+        except Exception:
+            return ""
 
     def _extract_images(self, html: str, base_url: str) -> List[str]:
         """Extract image URLs from HTML using regex, filtering out logos and icons"""

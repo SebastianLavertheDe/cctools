@@ -37,6 +37,10 @@ class RSSConfig:
         """Get max articles to process per feed"""
         return self.config.get('max_articles_per_feed', 20)
 
+    def get_max_article_age_days(self) -> int:
+        """Get max article age in days (0 = no filter)"""
+        return self.config.get('max_article_age_days', 0)
+
     def get_content_settings(self) -> Dict:
         """Get content extraction settings"""
         return self.config.get('content', {})

@@ -31,6 +31,86 @@ def load_config(config_file: str = "config.yaml") -> dict:
         return {}
 
 
+def _ensure_summary_file(summary_file: str, date: str) -> None:
+    """Create daily summary file with header if missing"""
+    if os.path.exists(summary_file):
+        return
+
+    with open(summary_file, "w", encoding="utf-8") as f:
+        f.write(f"# 📅 {date[:4]}-{date[4:6]}-{date[6:8]} 每日总结\n\n")
+        f.write("**共总结 0 篇文章**\n\n")
+        f.write(f"**生成时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        f.write("---\n\n")
+
+
+def _parse_summary_header(summary_file: str) -> tuple[int, str | None]:
+    """Parse existing summary file for count and last category"""
+    if not os.path.exists(summary_file):
+        return 0, None
+
+    count = 0
+    last_category = None
+    try:
+        with open(summary_file, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.startswith("**共总结 "):
+                    try:
+                        count_str = line.split("**共总结 ", 1)[1].split(" 篇文章", 1)[0]
+                        count = int(count_str)
+                    except Exception:
+                        pass
+                if line.startswith("## 📚 "):
+                    last_category = line.strip()[5:]
+    except Exception as e:
+        print(f"  Warning: Failed to read summary file header: {e}")
+
+    return count, last_category
+
+
+def _update_summary_header(summary_file: str, total_count: int) -> None:
+    """Update total count and generation time in summary file"""
+    try:
+        with open(summary_file, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        for i, line in enumerate(lines):
+            if line.startswith("**共总结 "):
+                lines[i] = f"**共总结 {total_count} 篇文章**\n"
+            if line.startswith("**生成时间**:"):
+                lines[i] = f"**生成时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+
+        with open(summary_file, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+    except Exception as e:
+        print(f"  Warning: Failed to update summary header: {e}")
+
+
+def _append_summary(summary_file: str, summary, last_category: str | None) -> str | None:
+    """Append a single summary to the daily file and return updated last category"""
+    with open(summary_file, "a", encoding="utf-8") as f:
+        if summary.category != last_category:
+            f.write(f"## 📚 {summary.category}\n\n")
+            last_category = summary.category
+
+        score_emoji = "⭐" if summary.score >= 80 else "📖" if summary.score >= 60 else "📄"
+        f.write(f"### {score_emoji} {summary.title}\n\n")
+        f.write(f"**评分**: {summary.score}/100\n\n")
+        f.write(f"**摘要**:\n{summary.summary}\n\n")
+
+        if summary.key_points:
+            f.write("**关键要点**:\n")
+            for point in summary.key_points[:5]:
+                f.write(f"- {point}\n")
+            f.write("\n")
+
+        if summary.source_url:
+            f.write(f"**链接**: [{summary.source_url}]({summary.source_url})\n\n")
+
+        f.write("---\n\n")
+
+    return last_category
+
+
 def main():
     """Main execution pipeline"""
     try:
@@ -80,26 +160,7 @@ def main():
                 notion_manager.push_daily_summary(today, all_summaries)
             return
 
-        # Step 3: Summarize new articles
-        print(f"\n🤖 Summarizing {len(new_articles)} new articles...")
-        summarizer = ArticleSummarizer()
-        batch_size = ai_config.get("batch_size", 5)
-        new_summaries = summarizer.batch_summarize(
-            new_articles, today, batch_size=batch_size
-        )
-
-        print(f"\n  Successfully summarized: {len(new_summaries)}/{len(new_articles)}")
-
-        # Step 4: Update cache
-        print(f"\n💾 Updating cache...")
-        for summary in new_summaries:
-            filename = os.path.basename(summary.file_path)
-            cache_manager.mark_as_summarized(today, filename, summary)
-
-        # Step 5: Save daily summary to local Markdown
-        print(f"\n📄 Saving daily summary to local Markdown...")
-
-        # Save to project root ./mymind/daily-summary directory
+        # Prepare summary file for incremental writes
         script_dir = os.path.dirname(os.path.abspath(__file__))
         # Go up three levels: skill -> skills -> .claude -> project root
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(script_dir)))
@@ -107,41 +168,49 @@ def main():
         os.makedirs(summary_dir, exist_ok=True)
 
         summary_file = os.path.join(summary_dir, f"{today}_daily_summary.md")
-        all_summaries = new_summaries + list(cached_summaries.values())
+        _ensure_summary_file(summary_file, today)
+        existing_count, last_category = _parse_summary_header(summary_file)
+        total_written = existing_count
 
-        # Group by category
-        by_category = {}
-        for summary in all_summaries:
-            if summary.category not in by_category:
-                by_category[summary.category] = []
-            by_category[summary.category].append(summary)
+        # If file is new but we already have cached summaries, append them once
+        if existing_count == 0 and cached_summaries:
+            print(f"\n📄 Writing cached summaries to local Markdown...")
+            for summary in sorted(
+                cached_summaries.values(), key=lambda s: (s.category, s.title)
+            ):
+                last_category = _append_summary(summary_file, summary, last_category)
+                total_written += 1
+            _update_summary_header(summary_file, total_written)
 
-        with open(summary_file, "w", encoding="utf-8") as f:
-            f.write(f"# 📅 {today[:4]}-{today[4:6]}-{today[6:8]} 每日总结\n\n")
-            f.write(f"**共总结 {len(all_summaries)} 篇文章**\n\n")
-            f.write(f"**生成时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-            f.write("---\n\n")
+        # Step 3: Summarize new articles and incrementally write results
+        print(f"\n🤖 Summarizing {len(new_articles)} new articles...")
+        summarizer = ArticleSummarizer()
+        batch_size = ai_config.get("batch_size", 5)
+        new_summaries = []
 
-            for category, category_summaries in sorted(by_category.items()):
-                f.write(f"## 📚 {category}\n\n")
+        for i in range(0, len(new_articles), batch_size):
+            batch = new_articles[i : i + batch_size]
+            print(
+                f"\n  Processing batch {i // batch_size + 1}/{(len(new_articles) + batch_size - 1) // batch_size}"
+            )
 
-                for summary in category_summaries:
-                    score_emoji = "⭐" if summary.score >= 80 else "📖" if summary.score >= 60 else "📄"
-                    f.write(f"### {score_emoji} {summary.title}\n\n")
-                    f.write(f"**评分**: {summary.score}/100\n\n")
-                    f.write(f"**摘要**:\n{summary.summary}\n\n")
+            for article in batch:
+                summary = summarizer.summarize_article(article, today)
+                if not summary:
+                    continue
 
-                    if summary.key_points:
-                        f.write("**关键要点**:\n")
-                        for point in summary.key_points[:5]:
-                            f.write(f"- {point}\n")
-                        f.write("\n")
+                new_summaries.append(summary)
 
-                    if summary.source_url:
-                        f.write(f"**链接**: [{summary.source_url}]({summary.source_url})\n\n")
+                # Step 4: Update cache after each summary
+                filename = os.path.basename(summary.file_path)
+                cache_manager.mark_as_summarized(today, filename, summary)
 
-                    f.write("---\n\n")
+                # Step 5: Incrementally append to daily summary file
+                last_category = _append_summary(summary_file, summary, last_category)
+                total_written += 1
+                _update_summary_header(summary_file, total_written)
 
+        print(f"\n  Successfully summarized: {len(new_summaries)}/{len(new_articles)}")
         print(f"  ✅ Saved to: {summary_file}")
 
         # Step 6: Push to Notion
@@ -149,6 +218,7 @@ def main():
             print(f"\n📤 Pushing to Notion...")
 
             notion_manager = NotionSummaryManager(notion_config.get("database_id"))
+            all_summaries = new_summaries + list(cached_summaries.values())
             page_id = notion_manager.push_daily_summary(today, all_summaries)
 
             if page_id:

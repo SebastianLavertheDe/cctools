@@ -66,6 +66,8 @@ class RSSManager:
         project_root = Path(__file__).parent.parent.parent.parent.parent.parent
         self.article_base_dir = project_root / "mymind" / "article"
         self.article_base_dir.mkdir(parents=True, exist_ok=True)
+        self.counter_file = self.article_base_dir / ".counter.json"
+        self.article_counter, self.current_date = self._load_counter_state()
 
         # Initialize AI client based on config
         try:
@@ -117,9 +119,67 @@ class RSSManager:
             self.translator = None
             self.translation_enabled = False
 
-        # Article counter for numbering
-        self.article_counter = 0
-        self.current_date = None
+    def _load_counter_state(self):
+        """Load counter state from file for persistence across runs"""
+        try:
+            saved_counter = 0
+            saved_date = None
+
+            # Try to load from counter file first
+            if self.counter_file.exists():
+                import json
+                with open(self.counter_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    saved_date = data.get('current_date')
+                    today = datetime.now().strftime('%Y%m%d')
+
+                    # Reset counter if it's a new day
+                    if saved_date != today:
+                        print(f"New day detected, will check directory for existing files (saved: {saved_date}, today: {today})")
+                        saved_counter = 0  # Reset, will check directory below
+                        saved_date = None
+                    else:
+                        saved_counter = data.get('article_counter', 0)
+                        print(f"Restored counter state: {saved_counter} (date: {saved_date})")
+                        return saved_counter, saved_date
+
+            # Check existing files in today's directory to find max counter
+            today_str = datetime.now().strftime('%Y%m%d')
+            today_dir = self.article_base_dir / today_str
+
+            if today_dir.exists():
+                # Find the maximum file number in today's directory
+                max_num = 0
+                for file in today_dir.glob("*.md"):
+                    # Extract number from filename (e.g., "123_title.md" -> 123)
+                    try:
+                        num_str = file.stem.split('_')[0]
+                        if num_str.isdigit():
+                            num = int(num_str)
+                            max_num = max(max_num, num)
+                    except:
+                        pass
+
+                if max_num > 0:
+                    print(f"Found existing files in {today_str}/, max counter: {max_num}")
+                    return max_num, today_str
+
+            return saved_counter, saved_date
+        except Exception as e:
+            print(f"Failed to load counter state: {e}, starting from 0")
+            return 0, None
+
+    def _save_counter_state(self):
+        """Save counter state to file for persistence across runs"""
+        try:
+            import json
+            with open(self.counter_file, 'w', encoding='utf-8') as f:
+                json.dump({
+                    'article_counter': self.article_counter,
+                    'current_date': self.current_date
+                }, f)
+        except Exception as e:
+            print(f"Warning: Failed to save counter state: {e}")
 
     def fetch_feed(self, feed: RSSFeed):
         """Fetch a single RSS feed"""
@@ -220,6 +280,7 @@ class RSSManager:
     ) -> None:
         """Process feed entries"""
         max_articles = self.config.get_max_articles_per_feed()
+        max_age_days = self.config.get_max_article_age_days()
 
         # First, filter out cached articles, then limit
         new_articles = []
@@ -233,6 +294,14 @@ class RSSManager:
 
             if self.cache_manager.is_article_cached(link):
                 continue
+
+            # Filter by article age if configured
+            if max_age_days > 0:
+                published = entry.get("published", "")
+                if published and not self._is_article_within_days(published, max_age_days):
+                    # Article is too old, skip and don't check more entries
+                    # (RSS feeds are sorted by date, so subsequent entries will be even older)
+                    break
 
             article = self._create_article_from_entry(entry, feed_info, parent_category)
             new_articles.append(article)
@@ -504,9 +573,57 @@ class RSSManager:
             with open(filepath, "w", encoding="utf-8") as f:
                 f.write("\n".join(md_content))
 
+            # Save counter state for persistence across runs
+            self._save_counter_state()
+
             print(f"    Saved to: {filepath}")
         except Exception as e:
             print(f"    Warning: Failed to save article: {e}")
+
+    def _is_article_within_days(self, published_str: str, days: int) -> bool:
+        """Check if article was published within the specified number of days"""
+        try:
+            from datetime import datetime, timezone, timedelta
+
+            # Try to parse common RSS date formats
+            formats = [
+                "%a, %d %b %Y %H:%M:%S %z",  # RFC 2822 with timezone
+                "%a, %d %b %Y %H:%M:%S %Z",  # RFC 2822 with UTC
+                "%a, %d %b %Y %H:%M:%S",     # RFC 2822 without timezone
+                "%Y-%m-%dT%H:%M:%S%z",       # ISO 8601
+                "%Y-%m-%dT%H:%M:%SZ",        # ISO 8601 UTC
+                "%Y-%m-%d %H:%M:%S",         # Simple format
+            ]
+
+            parsed_time = None
+            for fmt in formats:
+                try:
+                    parsed_time = datetime.strptime(published_str, fmt)
+                    break
+                except ValueError:
+                    continue
+
+            if parsed_time is None:
+                # If parsing fails, assume article is recent (don't filter)
+                return True
+
+            # Convert to UTC if timezone info available
+            if parsed_time.tzinfo is not None:
+                parsed_time = parsed_time.astimezone(timezone.utc).replace(tzinfo=None)
+            else:
+                # Assume no timezone means UTC
+                pass
+
+            # Get current UTC time
+            now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+
+            # Check if article is within the specified days
+            age_delta = now_utc - parsed_time
+            return age_delta <= timedelta(days=days)
+
+        except Exception:
+            # If parsing fails, assume article is recent (don't filter)
+            return True
 
     def _format_published_time(self, published_str: str) -> str:
         """Format published time to Shanghai timezone (UTC+8)"""

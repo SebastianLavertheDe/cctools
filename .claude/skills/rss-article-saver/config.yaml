@@ -1,6 +1,7 @@
 # RSS to Notion Configuration
 opml_file: "subscriptions.opml"
 max_articles_per_feed: 1
+max_article_age_days: 7  # Only fetch articles published within last N days
 content:
   extractor: "trafilatura"
   include_images: true

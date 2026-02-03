@@ -1,0 +1,4 @@
+interface:
+  display_name: "RSS To Summary Workflow"
+  short_description: "Orchestrate RSS fetch + daily summary workflows"
+  default_prompt: "Run or extend the RSS-to-summary workflow by executing configured skills in order and logging timings."

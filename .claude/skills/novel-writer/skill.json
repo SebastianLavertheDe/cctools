@@ -1,7 +1,0 @@
-{
-  "title": "Novel Writer",
-  "description": "Structured short novel creation assistant (8000-20000 words) that guides users through character development, plot outlining, and chapter-by-chapter writing",
-  "author": "Say",
-  "usage": "Invoke when user wants to write a short novel. The skill will ask questions step by step to gather all necessary information, then write the novel chapter by chapter according to the structured template.",
-  "alias": ["novel", "fiction", "write-novel"]
-}
