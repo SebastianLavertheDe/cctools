@@ -1,10 +1,10 @@
 skills:
   rss-article-saver:
     path: .claude/skills/rss-article-saver
-    command: ["uv", "run", "--env-file", ".env", "python", "main.py"]
+    command: ["/home/say/.local/bin/uv", "run", "--env-file", ".env", "python", "main.py"]
   daily-article-summarizer:
     path: .claude/skills/daily-article-summarizer
-    command: ["uv", "run", "--env-file", ".env", "python", "main.py"]
+    command: ["/home/say/.local/bin/uv", "run", "--env-file", ".env", "python", "main.py"]
 
 workflows:
   rss-to-summary:

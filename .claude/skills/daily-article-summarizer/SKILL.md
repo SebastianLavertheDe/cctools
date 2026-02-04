@@ -53,7 +53,6 @@ article_directory: "~/mymind/article"
 ai:
   provider: nvidia
   model: minimaxai/minimax-m2.1
-  max_articles_per_day: 20
   batch_size: 5
 
 # Notion settings

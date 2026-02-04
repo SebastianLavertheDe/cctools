@@ -11,6 +11,7 @@ import html as html_lib
 from typing import Optional, Dict, List
 from urllib.parse import urljoin, urlparse, parse_qs, unquote
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 
 
 class ContentExtractor:
@@ -847,15 +848,18 @@ class ContentExtractor:
 
             # Remove elements with matching classes, ids, or text content
             for element in soup.find_all(True):
-                if not element:
+                if not isinstance(element, Tag):
                     continue
 
                 # Check class and id attributes
-                classes = element.get("class", []) or []
-                class_str = (
-                    " ".join(classes) if isinstance(classes, list) else str(classes)
-                )
-                elem_id = element.get("id", "") or ""
+                try:
+                    classes = element.get("class", []) or []
+                    class_str = (
+                        " ".join(classes) if isinstance(classes, list) else str(classes)
+                    )
+                    elem_id = element.get("id", "") or ""
+                except AttributeError:
+                    continue
 
                 # Check if element matches unrelated patterns
                 text_content = element.string
@@ -908,7 +912,7 @@ class ContentExtractor:
                 {"id": re.compile(r"related|recommended|comments?|share", re.I)},
             ]:
                 for elem in soup.find_all(**selector):
-                    if elem:
+                    if elem and hasattr(elem, "decompose"):
                         elem.decompose()
 
             # Also remove headings with specific keywords and all content after them
