@@ -39,3 +39,4 @@ mymind/article/
 mymind/post/
 mymind/daily-summary/
 **/skills/**/logs/
+.claude/skills/x-following-fetcher/curl.txt

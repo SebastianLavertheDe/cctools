@@ -1,50 +1,19 @@
 """
 X Following Fetcher - Fetches latest posts from X (Twitter) users you follow
-and saves them to JSON format and Notion database.
+and saves them to Markdown format.
 """
 import json
-import os
 import re
+import shlex
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
-import requests
-from dotenv import load_dotenv
+from typing import Any
 
-# Load environment variables from .env file
-load_dotenv(Path(__file__).parent / ".env")
-
-OUTPUT_DIR = Path("/home/say/cctools/x")
-POSTED_IDS_FILE = OUTPUT_DIR / "posted_ids.json"
-
-NOTION_KEY = os.getenv("notion_key") or ""
-NOTION_DATABASE_ID = os.getenv("NOTION_DATABASE_ID") or ""
-NOTION_PAGE_ID = os.getenv("NOTION_PAGE_ID") or ""
-
-notion_client = None
-image_uploader = None
-
-
-def get_posted_ids() -> set:
-    """Load already posted tweet IDs from file"""
-    if POSTED_IDS_FILE.exists():
-        try:
-            with open(POSTED_IDS_FILE, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                return set(data.get('ids', []))
-        except Exception:
-            return set()
-    return set()
-
-
-def save_posted_id(tweet_id: str):
-    """Append a new posted tweet ID to file"""
-    posted_ids = get_posted_ids()
-    posted_ids.add(tweet_id)
-    with open(POSTED_IDS_FILE, 'w', encoding='utf-8') as f:
-        json.dump({'ids': list(posted_ids)}, f, ensure_ascii=False)
+OUTPUT_DIR = Path("/home/say/work/github/cctools/mymind/post")
+X_CURL_FILE = Path(__file__).parent / "curl.txt"
+CACHE_FILE = Path(__file__).parent / "posted_ids.json"
 
 
 def parse_twitter_date(twitter_date: str) -> str:
@@ -54,80 +23,25 @@ def parse_twitter_date(twitter_date: str) -> str:
         dt = datetime.strptime(twitter_date, "%a %b %d %H:%M:%S %z %Y")
         return dt.isoformat()
     except Exception:
-        # Fallback: return original if parsing fails
         return twitter_date
 
 
-def init_notion():
-    global notion_client, image_uploader
-    try:
-        from notion_client import Client
-        notion_client = Client(auth=NOTION_KEY)
-        image_uploader = NotionImageUploader()
-        print("✅ Notion 客户端初始化成功")
-        return True
-    except Exception as e:
-        print(f"❌ Notion 客户端初始化失败: {e}")
-        notion_client = None
-        image_uploader = None
-        return False
+def execute_curl_from_file() -> subprocess.CompletedProcess:
+    """从 curl.txt 读取 curl 命令并执行"""
+    if not X_CURL_FILE.exists():
+        raise FileNotFoundError(f"curl 文件不存在: {X_CURL_FILE}")
 
+    with open(X_CURL_FILE, "r", encoding="utf-8") as f:
+        curl_content = f.read().strip()
 
-class NotionImageUploader:
-    """Notion 图片上传器"""
-    
-    def __init__(self):
-        pass
-    
-    def extract_image_urls(self, text: str) -> list:
-        if not text:
-            return []
-        img_pattern = r'https?://[^\s<>"{}|\\^`\[\]]+\.(?:jpg|jpeg|png|gif|webp)[^\s<>"{}|\\^`\[\]]*'
-        matches = re.findall(img_pattern, text, re.IGNORECASE)
-        unique_urls = []
-        for url in matches:
-            if url not in unique_urls:
-                unique_urls.append(url)
-        return unique_urls
-    
-    def upload_image(self, image_url: str) -> Optional[str]:
-        try:
-            resp = requests.post(
-                "https://api.notion.com/v1/file_uploads",
-                headers={
-                    "Authorization": f"Bearer {NOTION_KEY}",
-                    "Notion-Version": "2022-06-28",
-                    "Content-Type": "application/json"
-                },
-                json={}
-            )
-            resp.raise_for_status()
-            upload_id = resp.json()["id"]
-            
-            import mimetypes
-            headers = {"User-Agent": "Mozilla/5.0"}
-            img_resp = requests.get(image_url, headers=headers, timeout=30)
-            img_resp.raise_for_status()
-            
-            mime = mimetypes.guess_type(image_url)[0] or "image/png"
-            filename = f"image_{upload_id}.{mime.split('/')[-1]}"
-            
-            requests.post(
-                f"https://api.notion.com/v1/file_uploads/{upload_id}/send",
-                headers={
-                    "Authorization": f"Bearer {NOTION_KEY}",
-                    "Notion-Version": "2022-06-28"
-                },
-                files={"file": (filename, img_resp.content, mime)}
-            ).raise_for_status()
-            
-            return upload_id
-        except Exception as e:
-            print(f"    ⚠️ 图片上传失败: {e}")
-            return None
-
-
-X_CURL_FILE = Path(__file__).parent / "x_curl.txt"
+    curl_cmd = curl_content.replace("\\\n", " ").replace("\\\r\n", " ")
+    cmd_list = shlex.split(curl_cmd)
+    return subprocess.run(
+        cmd_list,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
 
 
 def parse_tweet_entry(entry: dict[str, Any]) -> dict[str, Any] | None:
@@ -135,155 +49,98 @@ def parse_tweet_entry(entry: dict[str, Any]) -> dict[str, Any] | None:
         content = entry.get("content", {})
         tweet = content.get("itemContent", {})
 
-        if tweet.get("__typename") != "TweetTombstone":
-            tweet_results = tweet.get("tweet_results", {})
-            if tweet_results:
-                result = tweet_results.get("result", {})
-                legacy = result.get("legacy", {})
-                
-                # Extract user info from the correct location
-                # X API stores user data in result.core.user_results.result.core
-                user = {}
-                user_core = {}
-                
-                core = result.get("core", {})
-                user_results = core.get("user_results", {}).get("result", {})
-                
-                # Try the new path: result.core.user_results.result.core
-                if user_results:
-                    user_core = user_results.get("core", {})
-                    if user_core:
-                        user = user_core
-                
-                # Fallback: try result.core.user_results.result.legacy
-                if not user.get("screen_name"):
-                    user_legacy = user_results.get("legacy", {})
-                    if user_legacy:
-                        user = user_legacy
-                
-                user_name = user.get("name", "")
-                user_screen_name = user.get("screen_name", "")
-                user_verified = user_results.get("is_blue_verified", False) if user_results else False
-                
-                # Profile image from avatar
-                avatar = user_results.get("avatar", {}) if user_results else {}
-                profile_image_url = avatar.get("image_url", "") if avatar else ""
-                
-                # If still empty, try to extract from content (@mention)
-                if not user_screen_name:
-                    content_text = legacy.get("full_text", "")
-                    import re
-                    match = re.search(r'@(\w+)', content_text)
-                    if match:
-                        user_screen_name = match.group(1)
-                        user_name = user_screen_name  # Use screen_name as fallback
-                
-                extended_entities = legacy.get("extended_entities", {})
-                media = extended_entities.get("media", [])
-                image_urls = []
-                for m in media:
-                    if m.get("type") == "photo":
-                        image_urls.append(m.get("media_url_https", m.get("media_url", "")))
-                
-                # For RT posts, also check for quoted or retweeted status media
-                if not image_urls:
-                    quoted_status = result.get("quoted_status_result", {})
-                    if quoted_status:
-                        quoted_legacy = quoted_status.get("result", {}).get("legacy", {})
-                        quoted_entities = quoted_legacy.get("extended_entities", {})
-                        quoted_media = quoted_entities.get("media", [])
-                        for m in quoted_media:
-                            if m.get("type") == "photo":
-                                image_urls.append(m.get("media_url_https", m.get("media_url", "")))
-                
-                # Also check in retweeted_status for media
-                if not image_urls:
-                    retweeted_result = result.get("retweeted_status_result", {})
-                    if retweeted_result:
-                        rt_legacy = retweeted_result.get("result", {}).get("legacy", {})
-                        rt_entities = rt_legacy.get("extended_entities", {})
-                        rt_media = rt_entities.get("media", [])
-                        for m in rt_media:
-                            if m.get("type") == "photo":
-                                image_urls.append(m.get("media_url_https", m.get("media_url", "")))
+        if tweet.get("__typename") == "TweetTombstone":
+            return None
 
-                return {
-                    "id": legacy.get("id_str", ""),
-                    "user_name": user_name,
-                    "user_screen_name": user_screen_name,
-                    "user_verified": user_verified,
-                    "profile_image_url": profile_image_url,
-                    "content": legacy.get("full_text", ""),
-                    "created_at": legacy.get("created_at", ""),
-                    "retweet_count": legacy.get("retweet_count", 0),
-                    "like_count": legacy.get("favorite_count", 0),
-                    "reply_count": legacy.get("reply_count", 0),
-                    "quote_count": legacy.get("quote_count", 0),
-                    "bookmark_count": legacy.get("bookmark_count", 0),
-                    "lang": legacy.get("lang", ""),
-                    "source": legacy.get("source", "").replace("<a href=", "").replace("</a>", "").split(">")[-1] if legacy.get("source") else "",
-                    "image_urls": image_urls
-                }
+        tweet_results = tweet.get("tweet_results", {})
+        if not tweet_results:
+            return None
 
-        return None
+        result = tweet_results.get("result", {})
+        legacy = result.get("legacy", {})
+        if not legacy:
+            return None
+
+        core = result.get("core", {})
+        user_results = core.get("user_results", {}).get("result", {})
+        user_core = user_results.get("core", {})
+        user_legacy = user_results.get("legacy", {})
+        user = user_core or user_legacy or {}
+
+        user_name = user.get("name", "")
+        user_screen_name = user.get("screen_name", "")
+        user_verified = user_results.get("is_blue_verified", False) if user_results else False
+
+        avatar = user_results.get("avatar", {}) if user_results else {}
+        profile_image_url = avatar.get("image_url", "") if avatar else ""
+
+        extended_entities = legacy.get("extended_entities", {})
+        media = extended_entities.get("media", [])
+        image_urls = [
+            m.get("media_url_https", m.get("media_url", ""))
+            for m in media
+            if m.get("type") == "photo"
+        ]
+
+        tweet_id = legacy.get("id_str", "")
+        tweet_url = (
+            f"https://x.com/{user_screen_name}/status/{tweet_id}"
+            if user_screen_name and tweet_id
+            else ""
+        )
+
+        return {
+            "id": tweet_id,
+            "user_name": user_name,
+            "user_screen_name": user_screen_name,
+            "user_verified": user_verified,
+            "profile_image_url": profile_image_url,
+            "content": legacy.get("full_text", ""),
+            "created_at": parse_twitter_date(legacy.get("created_at", "")),
+            "retweet_count": legacy.get("retweet_count", 0),
+            "like_count": legacy.get("favorite_count", 0),
+            "reply_count": legacy.get("reply_count", 0),
+            "quote_count": legacy.get("quote_count", 0),
+            "bookmark_count": legacy.get("bookmark_count", 0),
+            "lang": legacy.get("lang", ""),
+            "source": "x.com",
+            "image_urls": image_urls,
+            "link": tweet_url,
+            "title": "",
+        }
     except Exception as e:
         print(f"  ⚠️ Parse error: {e}")
         return None
 
 
-def execute_curl_from_file() -> subprocess.CompletedProcess:
-    """从 x_curl.txt 读取 curl 命令并执行"""
-    if not X_CURL_FILE.exists():
-        raise FileNotFoundError(f"curl 文件不存在: {X_CURL_FILE}")
-
-    with open(X_CURL_FILE, "r", encoding="utf-8") as f:
-        curl_content = f.read().strip()
-
-    # 将多行 curl 命令转换为单行命令
-    # 移除行尾的换行符和反斜杠，保留参数
-    curl_cmd = curl_content.replace("\\\n", " ").replace("\\\r\n", " ")
-
-    # 解析 curl 命令
-    import shlex
-    cmd_list = shlex.split(curl_cmd)
-
-    return subprocess.run(
-        cmd_list,
-        capture_output=True,
-        text=True,
-        timeout=120
-    )
-
-
 def fetch_tweets() -> list[dict[str, Any]]:
     try:
         result = execute_curl_from_file()
-
         if result.returncode != 0:
             print(f"Error fetching tweets: {result.stderr}", file=sys.stderr)
             return []
 
         response = json.loads(result.stdout)
-
-        instructions = response.get("data", {}).get("home", {}).get("home_timeline_urt", {}).get("instructions", [])
+        instructions = (
+            response.get("data", {})
+            .get("home", {})
+            .get("home_timeline_urt", {})
+            .get("instructions", [])
+        )
 
         tweets = []
         seen_ids = set()
-        
         for instruction in instructions:
             if instruction.get("type") == "TimelineAddEntries":
                 entries = instruction.get("entries", [])
                 for entry in entries:
                     content = entry.get("content", {})
-                    typename = content.get("__typename")
-                    if typename == "TimelineTimelineItem":
+                    if content.get("__typename") == "TimelineTimelineItem":
                         tweet_data = parse_tweet_entry(entry)
                         if tweet_data and tweet_data["id"] not in seen_ids:
                             seen_ids.add(tweet_data["id"])
                             tweets.append(tweet_data)
-
         return tweets
-
     except subprocess.TimeoutExpired:
         print("Error: Request timed out", file=sys.stderr)
         return []
@@ -295,24 +152,108 @@ def fetch_tweets() -> list[dict[str, Any]]:
         return []
 
 
-def get_existing_ids() -> set:
-    existing_ids = set()
-    if OUTPUT_DIR.exists():
-        for f in OUTPUT_DIR.glob("*.json"):
-            try:
-                with open(f, "r", encoding="utf-8") as fp:
-                    data = json.load(fp)
-                    posts = data.get("posts", [])
-                    for post in posts:
-                        if "id" in post:
-                            existing_ids.add(post["id"])
-            except Exception:
-                continue
-    return existing_ids
+def load_cached_ids() -> set:
+    if not CACHE_FILE.exists():
+        return set()
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return set(data.get("ids", []))
+    except Exception:
+        return set()
 
 
-def save_to_json(tweets: list[dict[str, Any]]) -> tuple[int, int]:
-    existing_ids = get_existing_ids()
+def save_cached_ids(ids: set) -> None:
+    CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        json.dump({"ids": sorted(ids)}, f, ensure_ascii=False, indent=2)
+
+
+def sanitize_filename(name: str) -> str:
+    """Sanitize username for filename"""
+    # Remove invalid filesystem characters
+    invalid_chars = '<>:"/\\|?*'
+    for char in invalid_chars:
+        name = name.replace(char, "_")
+    # Remove protocol prefixes if present
+    name = re.sub(r'^https?[_:]', '', name)
+    # Clean up multiple underscores
+    name = re.sub(r'_+', '_', name)
+    return name.strip('_').strip()
+
+
+def clean_tweet_id(tweet_id: str) -> str:
+    """Clean tweet ID for filename use"""
+    # Remove RAW_ prefix if present
+    if tweet_id.startswith("RAW_"):
+        tweet_id = tweet_id[4:]
+    # Extract numeric ID if it's a URL
+    # Pattern: https://www.bestblogs.dev/feeds/123456789
+    match = re.search(r'/(\d{10,})', tweet_id)
+    if match:
+        return match.group(1)
+    # Fallback: just sanitize the ID
+    return sanitize_filename(tweet_id)
+
+
+def tweet_to_markdown(tweet: dict[str, Any]) -> str:
+    """Convert tweet dict to markdown format"""
+    lines = []
+
+    # Title: use title if available, otherwise use first line of content
+    title = tweet.get("title") or ""
+    content = tweet.get("content", "")
+
+    # Clean up title by removing extra whitespace
+    if title:
+        title = re.sub(r'\s+', ' ', title).strip()
+        lines.append(f"# {title}\n")
+    else:
+        # Use first line of content as title
+        first_line = content.split('\n')[0].strip()
+        if first_line:
+            lines.append(f"# {first_line}\n")
+
+    # Metadata section
+    lines.append("## 元数据\n")
+    lines.append(f"- **链接**: {tweet.get('link', '')}")
+    lines.append(f"- **作者**: {tweet.get('user_name', '')} (@{tweet.get('user_screen_name', '')})")
+    lines.append(f"- **发布时间**: {tweet.get('created_at', '')}")
+    lines.append(f"- **保存时间**: {tweet.get('fetched_at', '')}")
+    lines.append(f"- **来源**: {tweet.get('source', '')}")
+    lines.append(f"- **ID**: {tweet.get('id', '')}\n")
+
+    # Images section
+    image_urls = tweet.get("image_urls", [])
+    if image_urls:
+        lines.append("## 图片\n")
+        for img_url in image_urls:
+            lines.append(f"![]({img_url})")
+        lines.append("")
+
+    # Content section
+    if content:
+        lines.append("## 正文\n")
+        lines.append(content)
+        lines.append("")
+
+    # Metrics section
+    lines.append("## 互动数据\n")
+    lines.append(f"- 👍 点赞: {tweet.get('like_count', 0)}")
+    lines.append(f"- 🔄 转发: {tweet.get('retweet_count', 0)}")
+    lines.append(f"- 💬 回复: {tweet.get('reply_count', 0)}")
+    lines.append(f"- 📎 引用: {tweet.get('quote_count', 0)}")
+    lines.append("")
+
+    # Tweet embed link
+    lines.append("---")
+    lines.append(f"\n[查看原推]({tweet.get('link', '')})\n")
+
+    return "\n".join(lines)
+
+
+def save_to_markdown(tweets: list[dict[str, Any]]) -> tuple[int, int]:
+    existing_ids = load_cached_ids()
     new_tweets = [t for t in tweets if t["id"] not in existing_ids]
 
     if not new_tweets:
@@ -321,113 +262,57 @@ def save_to_json(tweets: list[dict[str, Any]]) -> tuple[int, int]:
 
     print(f"发现 {len(new_tweets)} 条新帖子")
 
-    for i, tweet in enumerate(new_tweets):
-        print(f"  处理 {i+1}/{len(new_tweets)}: @{tweet['user_screen_name']}")
+    # Create date directory
+    date_str = datetime.now().strftime("%Y%m%d")
+    date_dir = OUTPUT_DIR / date_str
+    date_dir.mkdir(parents=True, exist_ok=True)
+
+    # Sort new tweets by created_at (ascending) for stable numbering
+    def sort_key(t: dict[str, Any]):
+        return (t.get("created_at", ""), t.get("id", ""))
+
+    new_tweets.sort(key=sort_key)
+
+    # Determine starting index based on existing files in today's directory
+    start_index = 0
+    for md_file in date_dir.glob("*.md"):
+        match = re.match(r'(\d+)_', md_file.name)
+        if match:
+            try:
+                start_index = max(start_index, int(match.group(1)))
+            except Exception:
+                continue
+
+    for i, tweet in enumerate(new_tweets, start=start_index + 1):
+        print(f"  处理 {i-start_index}/{len(new_tweets)}: @{tweet['user_screen_name']}")
         tweet["fetched_at"] = datetime.now().isoformat()
 
-    date_str = datetime.now().strftime("%Y%m%d")
-    output_file = OUTPUT_DIR / f"{date_str}.json"
+        # Generate filename: HHMMSS_username_id.md
+        try:
+            created_dt = datetime.fromisoformat(tweet["created_at"])
+        except Exception:
+            created_dt = datetime.now()
+        time_str = created_dt.strftime("%H%M%S")
+        username = sanitize_filename(tweet["user_screen_name"])
+        clean_id = clean_tweet_id(tweet["id"])
+        filename = f"{i}_{username}_{clean_id}.md"
+        output_file = date_dir / filename
 
-    if output_file.exists():
-        with open(output_file, "r", encoding="utf-8") as fp:
-            existing_data = json.load(fp)
-    else:
-        existing_data = {"date": date_str, "updated_at": datetime.now().isoformat(), "posts": []}
+        # Convert tweet to markdown and save
+        markdown_content = tweet_to_markdown(tweet)
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(markdown_content)
+        existing_ids.add(tweet["id"])
 
-    existing_ids_in_file = {p["id"] for p in existing_data["posts"]}
-    for tweet in new_tweets:
-        if tweet["id"] not in existing_ids_in_file:
-            existing_data["posts"].append(tweet)
-
-    existing_data["updated_at"] = datetime.now().isoformat()
-
-    with open(output_file, "w", encoding="utf-8") as fp:
-        json.dump(existing_data, fp, ensure_ascii=False, indent=2)
-
-    print(f"\n已保存到: {output_file}")
+    print(f"\n已保存到: {date_dir}")
     print(f"新增: {len(new_tweets)} 条")
-    print(f"总计: {len(existing_data['posts'])} 条")
 
-    return len(new_tweets), len(existing_data["posts"])
+    # Count total tweets in date directory
+    total_count = len(list(date_dir.glob("*.md")))
+    print(f"目录总计: {total_count} 条")
 
-
-def push_to_notion(tweet: dict) -> bool:
-    if not notion_client:
-        return False
-    
-    try:
-        tweet_url = "https://x.com/" + tweet['user_screen_name'] + "/status/" + tweet['id']
-        user_name = tweet.get('user_name', tweet['user_screen_name'])
-        content = tweet['content']
-        
-        # Build properties with Link, Author, and Date fields
-        properties = {
-            'Title': {'title': [{'text': {'content': '@' + tweet['user_screen_name'] + ' - ' + user_name}}]},
-            'type': {'rich_text': [{'type': 'text', 'text': {'content': 'x'}}]},
-            'Link': {'url': tweet_url},
-            'Author': {'rich_text': [{'type': 'text', 'text': {'content': user_name}}]},
-            'Date': {'date': {'start': parse_twitter_date(tweet['created_at'])}},
-        }
-        
-        # Get cover image from first image_url if available
-        cover = None
-        image_urls = tweet.get('image_urls', [])
-        if image_urls:
-            cover = {'type': 'external', 'external': {'url': image_urls[0]}}
-        
-        children = [
-            {'object': 'block', 'type': 'paragraph', 'paragraph': {'rich_text': [{'type': 'text', 'text': {'content': 'Link: ' + tweet_url}}]}},
-            {'object': 'block', 'type': 'paragraph', 'paragraph': {'rich_text': [{'type': 'text', 'text': {'content': 'Time: ' + tweet['created_at']}}]}},
-            {'object': 'block', 'type': 'divider', 'divider': {}},
-        ]
-        
-        if content:
-            # Split content into multiple blocks if it exceeds Notion's 2000 char limit
-            chunk_size = 1900
-            for i in range(0, len(content), chunk_size):
-                chunk = content[i:i + chunk_size]
-                children.append({
-                    'object': 'block',
-                    'type': 'paragraph',
-                    'paragraph': {'rich_text': [{'type': 'text', 'text': {'content': chunk}}]}
-                })
-        
-        # Add embed tweet block
-        children.append({
-            'object': 'block',
-            'type': 'embed',
-            'embed': {'url': tweet_url}
-        })
-        
-        # Add all images to content (first image is also used as cover)
-        for img_url in image_urls[:4]:
-            children.append({
-                'object': 'block',
-                'type': 'image',
-                'image': {
-                    'type': 'external',
-                    'external': {'url': img_url}
-                }
-            })
-        
-        children.append({'object': 'block', 'type': 'paragraph', 'paragraph': {'rich_text': [{'type': 'text', 'text': {'content': 'Likes: ' + str(tweet.get('like_count', 0)) + ' | RTs: ' + str(tweet.get('retweet_count', 0)) + ' | Replies: ' + str(tweet.get('reply_count', 0))}}]}})
-        
-        notion_client.pages.create(
-            parent={'database_id': NOTION_DATABASE_ID},
-            properties=properties,
-            children=children,
-            cover=cover
-        )
-        
-        # Save ID to local file after successful push
-        save_posted_id(tweet['id'])
-        
-        print(f"  ✅ 已推送到 Notion: @{tweet['user_screen_name']}")
-        return True
-        
-    except Exception as e:
-        print(f"  ❌ Notion 推送失败: {e}")
-        return False
+    save_cached_ids(existing_ids)
+    return len(new_tweets), total_count
 
 
 def main():
@@ -436,26 +321,12 @@ def main():
     tweets = fetch_tweets()
 
     if not tweets:
-        print("Failed to fetch tweets. Please check your cookies and credentials.")
+        print("Failed to fetch tweets. Please check curl.txt and credentials.")
         sys.exit(1)
 
-    new_count, total_count = save_to_json(tweets)
-    
-    print(f"\n完成！新增 {new_count} 条，总计 {total_count} 条")
-    
-    if new_count > 0 and init_notion():
-        print("\n推送到 Notion...")
-        # Use local file for deduplication
-        posted_ids = get_posted_ids()
-        print(f"  已推送帖子: {len(posted_ids)} 条")
-        
-        new_tweets = [t for t in tweets if t["id"] not in posted_ids]
-        print(f"  待推送新帖子: {len(new_tweets)}")
-        
-        for i, tweet in enumerate(new_tweets):
-            print(f"  推送 {i+1}/{len(new_tweets)}: @{tweet['user_screen_name']}")
-            push_to_notion(tweet)
+    new_count, total_count = save_to_markdown(tweets)
 
+    print(f"\n完成！新增 {new_count} 条，总计 {total_count} 条")
 
 if __name__ == "__main__":
     main()

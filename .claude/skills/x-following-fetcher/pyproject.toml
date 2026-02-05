@@ -1,12 +1,9 @@
 [project]
 name = "x-following-fetcher"
 version = "0.1.0"
-description = "Fetches latest posts from X (Twitter) users you follow and saves them to Notion"
+description = "Fetches latest posts from X (Twitter) users you follow and saves them to Markdown"
 requires-python = ">=3.10"
 dependencies = [
-    "requests",
-    "notion-client",
-    "python-dotenv",
 ]
 
 [build-system]
