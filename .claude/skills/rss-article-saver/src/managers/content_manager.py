@@ -8,7 +8,7 @@ import re
 import os
 import json
 import html as html_lib
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Tuple
 from urllib.parse import urljoin, urlparse, parse_qs, unquote
 from bs4 import BeautifulSoup
 from bs4.element import Tag
@@ -45,6 +45,22 @@ class ContentExtractor:
                 )
                 downloaded = response.text
 
+            # Obsidian Publish pages load content via a markdown endpoint
+            obsidian_payload = self._extract_obsidian_publish_markdown(downloaded)
+            if obsidian_payload:
+                content, base_url = obsidian_payload
+                if content:
+                    if len(content) > self.max_length:
+                        content = content[: self.max_length] + "\n\n...(内容过长已截断)"
+                    result["content"] = content
+                    result["images"] = self._extract_images_from_markdown(
+                        content, base_url
+                    )
+                    metadata = trafilatura.metadata.extract_metadata(downloaded)
+                    if metadata and metadata.author:
+                        result["author"] = metadata.author
+                    return result
+
             # Extract images list first
             image_list = []
             if self.include_images:
@@ -52,6 +68,10 @@ class ContentExtractor:
 
             # Use BeautifulSoup to extract content with embedded images
             content = self._extract_content_with_images(downloaded, image_list)
+
+            # If the content is image-only or has too little text, treat as empty
+            if self._is_low_text_content(content):
+                content = ""
 
             # If content is too short, try structured data fallbacks (Next.js / ld+json)
             if not content or len(content.strip()) < 200:
@@ -250,6 +270,70 @@ class ContentExtractor:
             return True
         return False
 
+    def _extract_obsidian_publish_markdown(
+        self, html: str
+    ) -> Optional[Tuple[str, str]]:
+        """Extract markdown from Obsidian Publish preload endpoint if present."""
+        try:
+            match = re.search(r'preloadPage\s*=\s*f\([\'"]([^\'"]+)[\'"]\)', html)
+            if not match:
+                return None
+
+            md_url = match.group(1)
+            resp = requests.get(
+                md_url,
+                timeout=30,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                },
+            )
+            if resp.status_code != 200:
+                return None
+
+            content_type = resp.headers.get("content-type", "")
+            if "text/markdown" not in content_type and not md_url.endswith(".md"):
+                return None
+
+            base_url = md_url.rsplit("/", 1)[0] + "/"
+            return resp.text, base_url
+        except Exception:
+            return None
+
+    def _extract_images_from_markdown(self, markdown: str, base_url: str) -> List[str]:
+        """Extract image URLs from markdown, resolving relative paths."""
+        if not markdown:
+            return []
+        images = []
+        for img in re.findall(r"!\[[^\]]*\]\(([^)]+)\)", markdown):
+            images.append(img.strip())
+        for img in re.findall(r"!\[\[([^\]]+)\]\]", markdown):
+            images.append(img.strip())
+
+        resolved = []
+        for img in images:
+            if img.startswith("http"):
+                resolved.append(img)
+            else:
+                resolved.append(urljoin(base_url, img))
+        return list(dict.fromkeys(resolved))
+
+    def _count_meaningful_chars(self, text: str) -> int:
+        if not text:
+            return 0
+        return len(re.findall(r"[A-Za-z0-9\u4e00-\u9fff]", text))
+
+    def _is_low_text_content(self, content: Optional[str]) -> bool:
+        if not content:
+            return True
+        img_count = len(re.findall(r"!\[[^\]]*\]\([^)]+\)", content))
+        text_only = re.sub(r"!\[[^\]]*\]\([^)]+\)", "", content)
+        meaningful_chars = self._count_meaningful_chars(text_only)
+        if meaningful_chars < 40:
+            return True
+        if img_count > 0 and meaningful_chars < 120:
+            return True
+        return False
+
     def _html_to_markdown(self, html: str) -> str:
         """Convert HTML content to simple markdown-like text"""
         try:
@@ -442,6 +526,7 @@ class ContentExtractor:
 
             # Build text with embedded images
             content_parts = []
+            text_char_count = 0
 
             # Extract base URL from image_list (all from same domain)
             base = ""
@@ -769,6 +854,7 @@ class ContentExtractor:
                                 content_parts.append(f"\n> {text}\n")
                             else:
                                 content_parts.append(f"\n{text}\n")
+                            text_char_count += self._count_meaningful_chars(text)
                     processed.add(elem_id)
 
             # Handle line breaks
@@ -787,12 +873,35 @@ class ContentExtractor:
             # Clean up unrelated sections from markdown result
             result = self._clean_markdown_content(result)
 
-            return result.strip()
+            result = result.strip()
+
+            # If we extracted mostly images or too little text, fallback to br-based text
+            if self._is_low_text_content(result) or text_char_count < 120:
+                fallback_text = self._extract_text_with_br(main_content)
+                if self._count_meaningful_chars(fallback_text) > self._count_meaningful_chars(
+                    result
+                ):
+                    return fallback_text.strip()
+
+            return result
 
         except Exception as e:
             print(f"  BeautifulSoup extraction failed: {e}")
             # Fallback to trafilatura
             return trafilatura.extract(html) or ""
+
+    def _extract_text_with_br(self, container) -> str:
+        """Extract text from a container that uses <br> instead of <p> tags."""
+        if not container:
+            return ""
+        try:
+            for br in container.find_all("br"):
+                br.replace_with("\n")
+            text = container.get_text(separator="\n", strip=True)
+            text = re.sub(r"\n{3,}", "\n\n", text)
+            return text.strip()
+        except Exception:
+            return ""
 
     def _remove_unrelated_sections(self, soup) -> None:
         """Remove unrelated sections like ads, related posts, recommendations"""
