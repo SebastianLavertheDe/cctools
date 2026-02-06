@@ -85,7 +85,7 @@ class GeminiSummarizer:
 - translated_title: 翻译后的中文标题（更偏传播：有点击欲但不标题党，能准确概括核心）
 - summary: 200-300字的摘要（中文；面向大众/从业者均可读，强调"看点+价值+结论"）
 - key_points: 3-5个关键点（数组；每条20-50字，尽量"可转述、可截图、可做成短视频分镜"）
-- category: 文章分类（只能从 AI, System Design, Backend, Frontend, DevOps, Other 之一选择）
+- category: 文章分类（只能从 AI, System Design, Backend, Frontend, DevOps, Science, Writing, Startup, Prompt, Other 之一选择）
 - score: 文章质量评分（0-100的整数；评分口径更倾向传播度与增长潜力）
 
 ## 评分维度与权重（用于你内部计算score，不要在JSON中额外输出这些字段）
